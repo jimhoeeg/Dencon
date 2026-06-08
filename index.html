@@ -529,13 +529,16 @@
                 Hvis et SVG/PNG-aktiv senere lægges i /assets/dencon-logo.svg
                 kan markeringen erstattes med <img src="/assets/dencon-logo.svg" />. */}
             <button onClick={onReset} className="flex items-center gap-3" aria-label="Dencon Foods — start forfra">
-              <svg viewBox="0 0 64 44" className="h-9 w-auto" aria-hidden>
-                <path d="M5 33 C 5 13, 22 4, 38 13"
-                  stroke="#1FA463" strokeWidth="6" fill="none" strokeLinecap="round"/>
-                <path d="M14 40 C 30 32, 46 24, 60 32"
-                  stroke="#124D8C" strokeWidth="6" fill="none" strokeLinecap="round"/>
+              {/* To koncentriske kvartcirkler (Wi-Fi-stil) — ydre grøn, indre blå.
+                  Centrum er nede til venstre i viewBox. Erstat med <img src="/assets/dencon-logo.svg" />
+                  hvis officiel asset lægges i repoet. */}
+              <svg viewBox="0 0 64 48" className="h-9 sm:h-10 w-auto" aria-hidden>
+                <path d="M 4 4 A 40 40 0 0 1 44 44"
+                  stroke="#1FA463" strokeWidth="7.5" fill="none" strokeLinecap="butt"/>
+                <path d="M 4 22 A 22 22 0 0 1 26 44"
+                  stroke="#114E8C" strokeWidth="7.5" fill="none" strokeLinecap="butt"/>
               </svg>
-              <span className="font-extrabold text-[#124D8C] text-[22px] sm:text-[24px] leading-none tracking-[-0.01em]">
+              <span className="font-extrabold text-[#114E8C] text-[22px] sm:text-[26px] leading-none tracking-[-0.015em]">
                 DENCON FOODS
               </span>
             </button>
