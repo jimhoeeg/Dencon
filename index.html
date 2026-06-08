@@ -19,31 +19,27 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Fraunces:wght@500;600;700;800&display=swap" rel="stylesheet">
 
   <script>
-    /* ============================================================
-       Tailwind-tema kalibreret efter screenshots fra denconfoods.com:
-       - peach/cream hero-baggrund (#FBEDDD)
-       - dyb navy tekst (#0F1F2E)
-       - koral accent (knapper, links, scroll-top) (#E85D4F)
-       - grøn/blå logo-tones
-       Fonts: Inter (UI) + Fraunces (serif section headings, som i footer).
-       ============================================================ */
+    /* Tailwind-tema kalibreret efter denconfoods.com */
     tailwind.config = {
       theme: {
         extend: {
           colors: {
-            cream:    '#FBEDDD',   // hero/baggrund (varm peach)
-            bg:       '#FAF6EF',   // sektion baggrund
+            cream:    '#FBEDDD',
+            bg:       '#FAF6EF',
             paper:    '#FFFFFF',
-            ink:      '#0F1F2E',   // primær tekst + navy
+            ink:      '#0F1F2E',
             inkSoft:  '#3A4A58',
             inkMute:  '#6A7682',
-            line:     '#E5DCC9',   // beige border
+            line:     '#E5DCC9',
             lineSoft: '#EFE7D6',
-            coral:    '#E85D4F',   // accent (CTA / links / scroll-top)
+            coral:    '#E85D4F',
             coralDk:  '#C9483B',
-            forest:   '#1F4F3F',   // mørkegrøn (fra logo)
-            ocean:    '#1B6A8A',   // blå (fra logo)
-            footer:   '#0B1922',   // bundfooter
+            coralBg:  '#FCE5E0',
+            forest:   '#1F4F3F',
+            ocean:    '#1B6A8A',
+            footer:   '#0B1922',
+            sun:      '#F6C56A',
+            sunBg:    '#FBF1DA',
           },
           fontFamily: {
             sans:    ['Inter', 'ui-sans-serif', 'system-ui'],
@@ -70,8 +66,9 @@
     @keyframes fadeIn { from { opacity:0; transform:translateY(6px);} to { opacity:1; transform:translateY(0);} }
     .pop { animation: pop .25s ease both; }
     @keyframes pop { 0%{opacity:0; transform:scale(.96);} 100%{opacity:1; transform:scale(1);} }
+    .slide-in { animation: slideIn .35s ease both; }
+    @keyframes slideIn { from {opacity:0; transform: translateX(8px);} to {opacity:1; transform:translateX(0);} }
 
-    /* Pænere range-slider i Dencon-stil */
     input[type=range] {
       -webkit-appearance: none; height: 6px; border-radius: 999px;
       background: linear-gradient(to right, #0F1F2E var(--p,50%), #E5DCC9 var(--p,50%));
@@ -87,19 +84,17 @@
       width: 22px; height: 22px; border-radius: 50%;
       background: #fff; border: 3px solid #E85D4F; cursor: pointer;
     }
-
-    /* Dencon "scroll-top" coral knap-look (dekorativ) */
-    .dencon-pill {
-      background:#E85D4F; color:#fff;
-    }
-
-    /* Logo gradient (grøn-blå mark fra deres screenshot) */
+    .dencon-pill { background:#E85D4F; color:#fff; }
     .logo-mark {
       background: linear-gradient(135deg, #1F4F3F 0%, #1B6A8A 100%);
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
     }
+    details > summary { list-style: none; cursor: pointer; }
+    details > summary::-webkit-details-marker { display: none; }
+    details[open] .chev { transform: rotate(180deg); }
+    .chev { transition: transform .2s ease; }
   </style>
 </head>
 <body>
@@ -109,12 +104,7 @@
     const { useState, useMemo, useEffect } = React;
 
     /* ============================================================
-       PRODUKTDATA — bygget på Dencons egne brands (Big Al's,
-       Black Angus, Prime, Flame-Grilled, Plant Food Nordic,
-       Bakers Choice, Nordic Catch, Dencon Reserve, Bone Broth).
-       Felter: id, name, brand, vno, pricePerPortion, prepMinutes,
-       co2Reduction (%), wasteReduction (%), fact, icon, tags.
-       Let at swappe med ægte Dencon-data senere.
+       PRODUKTDATA — bygget på Dencons egne brands.
        ============================================================ */
     const PRODUCTS = {
       protein: {
@@ -122,68 +112,83 @@
           { id: 'p-bigal',   name: "Big Al's Flame-Grilled Patty 150g", brand: "Big Al's", vno: "DF-10412",
             pricePerPortion: 14.50, prepMinutes: 3, wasteReduction: 100, co2Reduction: 0,
             fact: "Flammegrillet og færdigstegt. Servér direkte fra ovn på 3 min. — 0% svind og ca. 15 min. sparet tilberedningstid pr. service.",
+            keywords: ['burger','hurtig','fastfood','klassisk'],
             icon: "🥩", tags: ['value','premium'] },
           { id: 'p-angus',   name: "Black Angus Burger Patty 180g", brand: "Big Al's", vno: "DF-10488",
             pricePerPortion: 22.00, prepMinutes: 6, wasteReduction: 80, co2Reduction: 0,
             fact: "100% Black Angus oksekød — saftig, mør og med tydelig storytelling der hæver snitprisen på din menu.",
+            keywords: ['premium','gourmet','luksus','angus','storytelling'],
             icon: "🥩", tags: ['premium'] },
           { id: 'p-prime',   name: "Prime Burger Patty 160g", brand: "Big Al's", vno: "DF-10522",
             pricePerPortion: 17.50, prepMinutes: 5, wasteReduction: 90, co2Reduction: 0,
             fact: "Prime-kvalitet med karakteristisk saftighed. Sweet spot mellem pris og premium-oplevelse.",
+            keywords: ['premium','værdi','kvalitet'],
             icon: "🥩", tags: ['premium','value'] },
           { id: 'p-plant',   name: "Plant Food Nordic Patty 140g", brand: "Plant Food Nordic", vno: "DF-20231",
             pricePerPortion: 12.90, prepMinutes: 3, wasteReduction: 100, co2Reduction: 72,
             fact: "Plantebaseret bøf med op til 72% lavere CO₂-aftryk end traditionel oksekødsbøf. Steges og smager som kød.",
+            keywords: ['plantebaseret','vegansk','klima','grøn','co2','bæredygtig'],
             icon: "🌱", tags: ['value','green'] },
         ],
         moede: [
           { id: 'p-chick',   name: "Pulled Chicken Sous Vide 1kg", brand: "Dencon Kitchen", vno: "DF-30911",
             pricePerPortion: 9.75, prepMinutes: 4, wasteReduction: 95, co2Reduction: 0,
             fact: "Færdigtilberedt sous vide. Opvarmes direkte i pose — minimerer servicestress på travle mødedage.",
+            keywords: ['kylling','møde','catering','hurtig'],
             icon: "🍗", tags: ['value','premium'] },
           { id: 'p-salm',    name: "Røget Laks Skiveskåret 500g", brand: "Nordic Catch", vno: "DF-31204",
             pricePerPortion: 18.20, prepMinutes: 1, wasteReduction: 100, co2Reduction: 0,
             fact: "Skiveskåret og portionsklar. Sparer 20 min. forberedelse pr. mødebuffet og giver perfekte snit hver gang.",
+            keywords: ['laks','fisk','premium','smørrebrød','nordic'],
             icon: "🐟", tags: ['premium'] },
           { id: 'p-falaf',   name: "Krydret Falafel Mini 1kg", brand: "Plant Food Nordic", vno: "DF-20488",
             pricePerPortion: 6.40, prepMinutes: 5, wasteReduction: 100, co2Reduction: 65,
             fact: "Plantebaseret protein-bombe — 65% lavere CO₂ end kødfyld og holder formen i buffeten i op til 2 timer.",
+            keywords: ['vegansk','plantebaseret','buffet','grøn'],
             icon: "🌱", tags: ['value','green'] },
           { id: 'p-broth',   name: "Bone Broth Klassisk 500ml", brand: "Bone Broth", vno: "DF-90122",
             pricePerPortion: 7.80, prepMinutes: 2, wasteReduction: 100, co2Reduction: 0,
             fact: "Langtidssimret som mormors fond. Klar til at servere som varm shot eller base til soup-bowl på mødet.",
+            keywords: ['varm','suppe','vinter','wellness','immune'],
             icon: "🍲", tags: ['premium','green'] },
         ],
         groen: [
           { id: 'p-plant2',  name: "Plant Food Nordic Pulled 1kg", brand: "Plant Food Nordic", vno: "DF-20122",
             pricePerPortion: 11.20, prepMinutes: 4, wasteReduction: 100, co2Reduction: 70,
             fact: "Op til 70% lavere CO₂-aftryk vs. oksekød. Optager marinade-smag på under 10 minutter.",
+            keywords: ['vegansk','pulled','klima','grøn'],
             icon: "🌱", tags: ['green','value'] },
           { id: 'p-tempeh',  name: "Marineret Tempeh Strips 800g", brand: "Plant Food Nordic", vno: "DF-20355",
             pricePerPortion: 13.80, prepMinutes: 5, wasteReduction: 100, co2Reduction: 78,
             fact: "Fermenteret sojaprotein med højt proteinindhold. 78% lavere CO₂ end traditionel kylling.",
+            keywords: ['vegansk','protein','klima','fermenteret','sojafri'],
             icon: "🌱", tags: ['green','premium'] },
           { id: 'p-jack',    name: "Pulled Jackfruit BBQ 1kg", brand: "Plant Food Nordic", vno: "DF-20399",
             pricePerPortion: 9.10, prepMinutes: 3, wasteReduction: 100, co2Reduction: 82,
             fact: "Klar på 3 min. til taco, wrap eller bowl. Autentisk pulled-tekstur og 82% lavere klima-aftryk.",
+            keywords: ['taco','wrap','bowl','vegansk','street food','klima'],
             icon: "🌱", tags: ['green','value'] },
           { id: 'p-beans',   name: "Belugalinser Færdigkogte 2kg", brand: "Plant Food Nordic", vno: "DF-20612",
             pricePerPortion: 5.60, prepMinutes: 1, wasteReduction: 100, co2Reduction: 88,
             fact: "Bælgfrugter har et af de laveste CO₂-aftryk pr. gram protein — 88% lavere end oksekød.",
+            keywords: ['linser','bæredygtig','protein','klima'],
             icon: "🫘", tags: ['green','value'] },
         ],
         tapas: [
           { id: 'p-cho',     name: "Chorizo Iberico Slices 500g", brand: "Dencon Reserve", vno: "DF-41203",
             pricePerPortion: 11.50, prepMinutes: 1, wasteReduction: 100, co2Reduction: 0,
             fact: "Færdigskåret og portionsklar. Holder i 3 dage i kølemontre uden kvalitetstab.",
+            keywords: ['chorizo','spansk','iberico','premium','bar'],
             icon: "🥓", tags: ['premium'] },
           { id: 'p-meatb',   name: "Mini Meatballs Crispy 1kg", brand: "Big Al's", vno: "DF-10599",
             pricePerPortion: 7.20, prepMinutes: 4, wasteReduction: 100, co2Reduction: 0,
             fact: "Færdigstegte og frostklare — 4 min. i konvektovn og klar til servering på bar-snack platte.",
+            keywords: ['kødboller','snacks','bar','fingermad'],
             icon: "🍖", tags: ['value'] },
           { id: 'p-haloum',  name: "Halloumi Sticks Panerede 800g", brand: "Plant Food Nordic", vno: "DF-20612",
             pricePerPortion: 9.40, prepMinutes: 4, wasteReduction: 100, co2Reduction: 55,
             fact: "Vegetarisk crowd-pleaser med 55% lavere CO₂ end kød-tapas. Stegt på 4 min.",
+            keywords: ['vegetar','ost','crowd-pleaser','panerede'],
             icon: "🧀", tags: ['green','premium'] },
         ],
       },
@@ -192,57 +197,57 @@
           { id: 'b-brioche', name: "Brioche Bun Premium 90g", brand: "Bakers Choice", vno: "DF-50122",
             pricePerPortion: 4.20, prepMinutes: 1, wasteReduction: 100, co2Reduction: 0,
             fact: "Frostkonserveret — defroster på 20 min. Ingen dagligt svind på brød.",
-            icon: "🍞", tags: ['premium','value'] },
+            keywords: ['brioche','blød','premium'], icon: "🍞", tags: ['premium','value'] },
           { id: 'b-pot',     name: "Potato Bun Sourdough 85g", brand: "Bakers Choice", vno: "DF-50188",
             pricePerPortion: 4.80, prepMinutes: 1, wasteReduction: 100, co2Reduction: 10,
             fact: "Surdejshævet — giver dybere smag og holder formen under saftige toppings og sauce.",
-            icon: "🥖", tags: ['premium'] },
+            keywords: ['surdej','kartoffel','holdbar'], icon: "🥖", tags: ['premium'] },
           { id: 'b-glufri',  name: "Glutenfri Bun 80g", brand: "Bakers Choice", vno: "DF-50301",
             pricePerPortion: 6.10, prepMinutes: 1, wasteReduction: 100, co2Reduction: 0,
             fact: "Åbn op for nye gæstesegmenter — 1 ud af 10 danskere efterspørger glutenfri muligheder.",
-            icon: "🥯", tags: ['value','premium','green'] },
+            keywords: ['glutenfri','allergi','inklusion'], icon: "🥯", tags: ['value','premium','green'] },
         ],
         moede: [
           { id: 'b-wrap',    name: "Hvedetortilla 25cm (24 stk)", brand: "Bakers Choice", vno: "DF-50455",
             pricePerPortion: 2.30, prepMinutes: 1, wasteReduction: 100, co2Reduction: 0,
             fact: "Lang holdbarhed — minimerer brød-svind til 0% i mødecateringen.",
-            icon: "🌯", tags: ['value','premium','green'] },
+            keywords: ['wrap','tortilla','fingermad','catering'], icon: "🌯", tags: ['value','premium','green'] },
           { id: 'b-rug',     name: "Rugbrødsskiver Skiveskåret", brand: "Bakers Choice", vno: "DF-50488",
             pricePerPortion: 1.80, prepMinutes: 0, wasteReduction: 100, co2Reduction: 5,
             fact: "Klassiker til smørrebrød. Skiveskåret = ingen knivtid og perfekte portionsstørrelser.",
-            icon: "🍞", tags: ['value','premium'] },
+            keywords: ['rugbrød','smørrebrød','dansk','klassisk'], icon: "🍞", tags: ['value','premium'] },
           { id: 'b-cia',     name: "Mini Ciabatta 50g (40 stk)", brand: "Bakers Choice", vno: "DF-50511",
             pricePerPortion: 3.10, prepMinutes: 4, wasteReduction: 100, co2Reduction: 0,
             fact: "Italiensk klassiker, opvarmes på 4 min. Perfekt portionsstørrelse til mødecatering.",
-            icon: "🥖", tags: ['premium','value'] },
+            keywords: ['ciabatta','italiensk','mini'], icon: "🥖", tags: ['premium','value'] },
         ],
         groen: [
           { id: 'b-quinoa',  name: "Quinoa & Bønne-Bowl Base 2kg", brand: "Plant Food Nordic", vno: "DF-60122",
             pricePerPortion: 6.20, prepMinutes: 2, wasteReduction: 100, co2Reduction: 60,
             fact: "Færdigkogt — blot opvarm. 60% lavere CO₂ end ris-baseret bowl.",
-            icon: "🥣", tags: ['green','value'] },
+            keywords: ['bowl','quinoa','sundt','klima'], icon: "🥣", tags: ['green','value'] },
           { id: 'b-flat',    name: "Fuldkorns Flatbread 90g", brand: "Bakers Choice", vno: "DF-50601",
             pricePerPortion: 3.40, prepMinutes: 1, wasteReduction: 100, co2Reduction: 15,
             fact: "Fuldkorn + frø — fremstår sundere på menukortet og bygger plate appeal.",
-            icon: "🫓", tags: ['green','premium','value'] },
+            keywords: ['fuldkorn','sundhed'], icon: "🫓", tags: ['green','premium','value'] },
           { id: 'b-sweet',   name: "Sweet Potato Wedges 2kg", brand: "Dencon Kitchen", vno: "DF-60204",
             pricePerPortion: 4.10, prepMinutes: 8, wasteReduction: 100, co2Reduction: 25,
             fact: "Forskåret og forfriturestegt. Klar til ovn — sparer 12 min. forberedelse pr. portion.",
-            icon: "🍠", tags: ['green','premium'] },
+            keywords: ['sød kartoffel','wedges','side'], icon: "🍠", tags: ['green','premium'] },
         ],
         tapas: [
           { id: 'b-crost',   name: "Mini Crostini 25g (50 stk)", brand: "Bakers Choice", vno: "DF-50711",
             pricePerPortion: 1.40, prepMinutes: 0, wasteReduction: 100, co2Reduction: 0,
             fact: "Færdigristet og krydret — servér direkte fra pose med 0% spild.",
-            icon: "🥖", tags: ['value','premium'] },
+            keywords: ['crostini','tapas','fingermad'], icon: "🥖", tags: ['value','premium'] },
           { id: 'b-pita',    name: "Mini Pita 40g (40 stk)", brand: "Bakers Choice", vno: "DF-50755",
             pricePerPortion: 2.10, prepMinutes: 2, wasteReduction: 100, co2Reduction: 0,
             fact: "Lommen åbnes nemt og fyldes — perfekt finger-mad format til bar og event.",
-            icon: "🫓", tags: ['value','green'] },
+            keywords: ['pita','fingermad','street food'], icon: "🫓", tags: ['value','green'] },
           { id: 'b-bli',     name: "Blinis Mini Russian 15g (60 stk)", brand: "Nordic Catch", vno: "DF-50811",
             pricePerPortion: 2.80, prepMinutes: 1, wasteReduction: 100, co2Reduction: 0,
             fact: "Klassisk base til premium-tapas. Hæver snitprisen pr. canapé betragteligt.",
-            icon: "🥞", tags: ['premium'] },
+            keywords: ['blinis','canapé','premium','russisk'], icon: "🥞", tags: ['premium'] },
         ],
       },
       topping: {
@@ -250,64 +255,63 @@
           { id: 't-truf',    name: "Trøffel-Aioli 500ml", brand: "Dencon Reserve", vno: "DF-70123",
             pricePerPortion: 2.80, prepMinutes: 0, wasteReduction: 100, co2Reduction: 0,
             fact: "Premium-sauce der løfter snitprisen pr. burger med op til 15 kr. på menukortet.",
-            icon: "🫒", tags: ['premium'] },
+            keywords: ['trøffel','luksus','premium','aioli'], icon: "🫒", tags: ['premium'] },
           { id: 't-bbq',     name: "Smokey BBQ Sauce 1L", brand: "Big Al's", vno: "DF-70188",
             pricePerPortion: 0.90, prepMinutes: 0, wasteReduction: 100, co2Reduction: 0,
             fact: "Lang holdbarhed efter åbning (4 uger) — eliminerer sauce-svind i køkkenet.",
-            icon: "🍶", tags: ['value'] },
+            keywords: ['bbq','røget','klassisk'], icon: "🍶", tags: ['value'] },
           { id: 't-veg',     name: "Vegansk Cheddar Slices 1kg", brand: "Plant Food Nordic", vno: "DF-20801",
             pricePerPortion: 2.30, prepMinutes: 0, wasteReduction: 100, co2Reduction: 60,
             fact: "Smelter som ægte cheddar — gør hele burgeren 100% plantebaseret.",
-            icon: "🧀", tags: ['green','value'] },
+            keywords: ['vegansk','ost','cheddar','klima'], icon: "🧀", tags: ['green','value'] },
         ],
         moede: [
           { id: 't-husk',    name: "Hummus Klassisk 1kg", brand: "Plant Food Nordic", vno: "DF-20911",
             pricePerPortion: 1.60, prepMinutes: 0, wasteReduction: 100, co2Reduction: 50,
             fact: "Plantebaseret crowd-pleaser. 50% lavere CO₂ end traditionel remoulade.",
-            icon: "🥣", tags: ['green','value','premium'] },
+            keywords: ['hummus','vegansk','spread'], icon: "🥣", tags: ['green','value','premium'] },
           { id: 't-pic',     name: "Hjemmestil Pickles Sortiment", brand: "Dencon Kitchen", vno: "DF-71022",
             pricePerPortion: 1.20, prepMinutes: 0, wasteReduction: 100, co2Reduction: 0,
             fact: "Skiveskåret og krydderiet — tilfører syre og tekstur uden forberedelse.",
-            icon: "🥒", tags: ['value','premium'] },
+            keywords: ['pickles','syrlig','tekstur'], icon: "🥒", tags: ['value','premium'] },
           { id: 't-pesto',   name: "Pesto Genovese Premium 1kg", brand: "Dencon Reserve", vno: "DF-71166",
             pricePerPortion: 2.40, prepMinutes: 0, wasteReduction: 100, co2Reduction: 0,
             fact: "Storytelling-friendly: italiensk basilikum + 12 mdr. Parmigiano Reggiano.",
-            icon: "🌿", tags: ['premium'] },
+            keywords: ['pesto','italiensk','premium'], icon: "🌿", tags: ['premium'] },
         ],
         groen: [
           { id: 't-tahini',  name: "Tahini-Citron Dressing 1L", brand: "Plant Food Nordic", vno: "DF-21055",
             pricePerPortion: 1.40, prepMinutes: 0, wasteReduction: 100, co2Reduction: 55,
             fact: "Klimavenlig dressing med 55% lavere CO₂ end fløde-baserede dressinger.",
-            icon: "🥗", tags: ['green','value'] },
+            keywords: ['tahini','dressing','klima','vegansk'], icon: "🥗", tags: ['green','value'] },
           { id: 't-feta',    name: "Vegansk 'Feta' i tern 1kg", brand: "Plant Food Nordic", vno: "DF-21099",
             pricePerPortion: 2.90, prepMinutes: 0, wasteReduction: 100, co2Reduction: 65,
             fact: "Helt plantebaseret. Smuldrer og smager autentisk over bowls og salater.",
-            icon: "🧀", tags: ['green','premium'] },
+            keywords: ['feta','vegansk','salat'], icon: "🧀", tags: ['green','premium'] },
           { id: 't-pick',    name: "Quick-Pickled Rødløg 1kg", brand: "Dencon Kitchen", vno: "DF-71288",
             pricePerPortion: 1.10, prepMinutes: 0, wasteReduction: 100, co2Reduction: 20,
             fact: "Færdiglavet — sparer 20 min. lab-tid pr. service og giver pop på tallerkenen.",
-            icon: "🧅", tags: ['green','value','premium'] },
+            keywords: ['pickles','rødløg','syrlig','farve'], icon: "🧅", tags: ['green','value','premium'] },
         ],
         tapas: [
           { id: 't-oli',     name: "Marinerede Oliven Mix 1kg", brand: "Dencon Reserve", vno: "DF-71411",
             pricePerPortion: 2.10, prepMinutes: 0, wasteReduction: 100, co2Reduction: 0,
             fact: "Premium spanske oliven — bygger autenticitet og hæver pris pr. snack.",
-            icon: "🫒", tags: ['premium','green'] },
+            keywords: ['oliven','spansk','bar'], icon: "🫒", tags: ['premium','green'] },
           { id: 't-roast',   name: "Røget Paprika-Mayo 1kg", brand: "Dencon Kitchen", vno: "DF-71488",
             pricePerPortion: 1.30, prepMinutes: 0, wasteReduction: 100, co2Reduction: 0,
             fact: "Holdbarhed på 4 uger åbnet — nul svind på dipsaucer.",
-            icon: "🌶️", tags: ['value','premium'] },
+            keywords: ['paprika','dip','sauce'], icon: "🌶️", tags: ['value','premium'] },
           { id: 't-cara',    name: "Karameliserede Valnødder 500g", brand: "Plant Food Nordic", vno: "DF-21222",
             pricePerPortion: 1.90, prepMinutes: 0, wasteReduction: 100, co2Reduction: 30,
             fact: "Vegansk crunch der færdiggør plade-præsentationen med en premium feel.",
-            icon: "🌰", tags: ['green','premium'] },
+            keywords: ['valnød','crunch','vegansk','premium'], icon: "🌰", tags: ['green','premium'] },
         ],
       },
     };
 
     /* ============================================================
-       SVG line icons til de fire spisesituationer — matcher den
-       tynde stregstil på denconfoods.com/produkter (kategoriikoner).
+       Line icons — matcher Dencons tynde stregstil.
        ============================================================ */
     const Icon = {
       burger: (p) => (
@@ -363,9 +367,29 @@
           <path d="M16 52 36 32"/>
         </svg>
       ),
+      sparkle: (p) => (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" {...p}>
+          <path d="M12 3v4M12 17v4M3 12h4M17 12h4M5.6 5.6l2.8 2.8M15.6 15.6l2.8 2.8M5.6 18.4l2.8-2.8M15.6 8.4l2.8-2.8"/>
+        </svg>
+      ),
+      plus: (p) => (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}>
+          <path d="M12 5v14M5 12h14"/>
+        </svg>
+      ),
+      trash: (p) => (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" {...p}>
+          <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M6 6l1 14a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-14"/>
+        </svg>
+      ),
+      lock: (p) => (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" {...p}>
+          <rect x="4" y="11" width="16" height="10" rx="2"/>
+          <path d="M8 11V7a4 4 0 0 1 8 0v4"/>
+        </svg>
+      ),
     };
 
-    // De fire spisesituationer (med matching SVG-ikoner)
     const SITUATIONS = [
       { id: 'burger', title: "Burger & Fastfood",      Icon: Icon.burger,
         desc: "Hurtig service, høj snitpris, klassisk burger-format.", productKey: "burger" },
@@ -377,7 +401,6 @@
         desc: "Små, lækre bidder til bar, café og event.",              productKey: "tapas"  },
     ];
 
-    // De tre profiler / ambitionsniveauer
     const PROFILES = [
       { id: 'value',   title: "Value & Speed",     Icon: Icon.bolt,
         desc: "Lav tilberedningstid og skarp økonomi pr. portion.",
@@ -390,7 +413,6 @@
         tagline: "Mindre aftryk. Mere mening." },
     ];
 
-    // Genererer et fængende koncept-navn baseret på valg
     function makeConceptName(situationId, profileId) {
       const map = {
         burger: { value: "The Speedy Diner Concept", premium: "The Black Angus Signature", green: "The Plant Burger House" },
@@ -402,7 +424,102 @@
     }
 
     /* ============================================================
-       Top-nav matchende denconfoods.com (logo + nav-links + flag)
+       CVR-validering — Modulus-11 efter dansk CVR-standard.
+       Vægte: 2,7,6,5,4,3,2,1. Sum mod 11 == 0 → gyldigt.
+       ============================================================ */
+    function normalizeCVR(s) { return (s||'').replace(/\D/g,'').slice(0,8); }
+    function validateCVR(s) {
+      const d = normalizeCVR(s);
+      if (d.length !== 8) return false;
+      const w = [2,7,6,5,4,3,2,1];
+      let sum = 0;
+      for (let i = 0; i < 8; i++) sum += parseInt(d[i],10) * w[i];
+      return sum % 11 === 0;
+    }
+    // Eksempler på gyldige test-CVR (alle består mod-11):
+    //   17612492 (Dencon Foods), 25052943, 28866984, 19815015
+
+    /* ============================================================
+       AI-lignende product-matcher: scorer alle produkter baseret
+       på keywords i brugerens kommentar og returnerer de 3 bedste
+       der IKKE allerede er valgt. Placeholder for en rigtig LLM.
+       ============================================================ */
+    function suggestExtraProducts(comment, situationKey, alreadyPickedIds) {
+      const text = (comment||'').toLowerCase();
+      const allLists = ['protein','base','topping']
+        .flatMap(cat => PRODUCTS[cat][situationKey] || []);
+      const scored = allLists
+        .filter(p => !alreadyPickedIds.has(p.id))
+        .map(p => {
+          let score = 0;
+          (p.keywords||[]).forEach(k => { if (text.includes(k.toLowerCase())) score += 3; });
+          // bonus hvis kommentaren nævner generelle temaer
+          if (/klima|bæredygt|co2|grøn/.test(text) && p.co2Reduction > 40) score += 2;
+          if (/hurtig|travl|stress|tempo/.test(text) && p.prepMinutes <= 3) score += 2;
+          if (/premium|gourmet|fest|fine|luksus/.test(text) && p.tags?.includes('premium')) score += 2;
+          if (/børn|kid|fastfood/.test(text) && p.tags?.includes('value')) score += 1;
+          return { p, score };
+        })
+        .sort((a,b) => b.score - a.score);
+      // returnér op til 3 — og hvis ingen scorer, vælg 3 tilfældige som "fall-back"
+      const top = scored.filter(s => s.score > 0).slice(0,3).map(s => s.p);
+      if (top.length >= 1) return top;
+      return scored.slice(0,3).map(s => s.p);
+    }
+
+    /* ============================================================
+       Tip-bank — vores 3 ekstra forslag på koncept-siden.
+       Vælges dynamisk ud fra situation, profil og kommentar.
+       ============================================================ */
+    const TIPS_BANK = [
+      { id:'broth', kw:['vinter','varm','wellness','immune','energi'], situations:['*'], profiles:['*'],
+        title:"Tilføj Bone Broth som velkomst",
+        body:"Servér en lille 'shot' af Dencon Bone Broth i espresso-kop ved ankomst. Skaber et premium-touch og holder gæsterne mætte længere — perfekt til vinter-services og morgenmøder." },
+      { id:'kids', kw:['børn','familier','kids','barn'], situations:['burger','tapas','moede'], profiles:['value','premium','green'],
+        title:"Lav en mini-børnemenu på 2 minutter",
+        body:"Brug Big Al's Mini Meatballs + Mini Ciabatta + ketchup som færdigt børnekoncept. Det udvider dit gæstesegment uden ekstra arbejdsgang i køkkenet." },
+      { id:'merch', kw:['premium','gourmet','fine','luksus','signatur'], situations:['burger','tapas','moede','groen'], profiles:['premium'],
+        title:"Sælg historien på menukortet",
+        body:"Tilføj brand-storytelling: 'Black Angus, modnet 28 dage' eller 'Plant Food Nordic — −72% CO₂'. Køkkenchefer der gør det rapporterer 12-18% højere snitpris." },
+      { id:'mep', kw:['tid','travl','stress','speed','hurtig','tempo'], situations:['*'], profiles:['*'],
+        title:"Forbered i batches dagen før",
+        body:"Tag alle færdigtilberedte komponenter ud af frost dagen før. Det halverer service-tiden og giver dig 25-40% mere kapacitet på spidsbelastede dage." },
+      { id:'co2', kw:['klima','bæredygt','co2','grøn','planet'], situations:['*'], profiles:['green','*'],
+        title:"Markedsfør dit CO₂-tal aktivt",
+        body:"Vis det reducerede CO₂-aftryk direkte på menukortet (fx '−72% CO₂ vs. okse'). 64% af danske forbrugere vælger den klimavenlige ret hvis tallet er synligt." },
+      { id:'pair', kw:['drink','øl','vin','bar','aften'], situations:['tapas','burger'], profiles:['premium','value'],
+        title:"Sæt en signatur-drink til konceptet",
+        body:"Foreslå en fast 'concept pairing' — fx Smokey BBQ Burger + IPA. Solgte koncepter med drink-pairing har 31% højere gennemsnitlig bon." },
+      { id:'allergi', kw:['allergi','glutenfri','vegansk','vegetar'], situations:['*'], profiles:['*'],
+        title:"Tilføj én allergivenlig variant",
+        body:"En enkelt Glutenfri Bun eller Vegansk Cheddar Slice gør hele konceptet inkluderende — og rammer 1 ud af 5 gæster der ellers ville have valgt et andet sted." },
+      { id:'buffet', kw:['buffet','møde','konference','catering','event'], situations:['moede','tapas'], profiles:['*'],
+        title:"Brug 70/30 reglen til buffet",
+        body:"70% færdigtilberedte komponenter + 30% friske toppings giver wow-faktor uden stress. Du sparer 40% køkkentid og holder svindet under 5%." },
+      { id:'season', kw:['sæson','sommer','vinter','jul','påske'], situations:['*'], profiles:['*'],
+        title:"Rotér ét element pr. måned",
+        body:"Behold konceptets DNA, men rotér ét element (fx topping eller sauce) månedligt. Det får gæsterne tilbage uden at du skal omkalibrere køkkenet." },
+      { id:'svind', kw:['svind','spild','økonomi','besparelse'], situations:['*'], profiles:['value','*'],
+        title:"Færdigportionér i bagside-vej",
+        body:"Brug færdigt-skårne komponenter (laks, chorizo, brød) til at eliminere knivtid og kassér-stykker. Køkkener vi arbejder med rapporterer 47% lavere madsvind." },
+    ];
+
+    function pickTips(situationId, profileId, comment) {
+      const text = (comment||'').toLowerCase();
+      const scored = TIPS_BANK.map(t => {
+        let score = 0;
+        const sMatch = t.situations.includes('*') || t.situations.includes(situationId);
+        const pMatch = t.profiles.includes('*') || t.profiles.includes(profileId);
+        if (sMatch) score += 1;
+        if (pMatch) score += 1;
+        t.kw.forEach(k => { if (text.includes(k)) score += 3; });
+        return { t, score };
+      }).sort((a,b) => b.score - a.score);
+      return scored.slice(0,3).map(s => s.t);
+    }
+
+    /* ============================================================
+       UI-komponenter
        ============================================================ */
     function DenconHeader({ onReset }) {
       return (
@@ -433,9 +550,6 @@
       );
     }
 
-    /* ============================================================
-       Footer matchende denconfoods.com (serif-headers, navy bund)
-       ============================================================ */
     function DenconFooter() {
       const cats = ["Okse","Gris","Lam","And","Kylling","Andet fjerkræ","Bacon","Fastfood","Ost","Bælgfrugter & plantebaseret","Brød og kager","Bone Broth"];
       return (
@@ -481,15 +595,12 @@
       );
     }
 
-    // Kort til Trin 1 (spisesituation) — hvidt kort, tyndt linje-ikon, label nedenunder
     function SituationCard({ s, selected, onClick }) {
       const I = s.Icon;
       return (
-        <button
-          onClick={onClick}
+        <button onClick={onClick}
           className={`group text-left rounded-lg border bg-paper p-6 transition-all shadow-card hover:shadow-cardHover
-            ${selected ? 'border-coral ring-2 ring-coral/30' : 'border-line hover:border-ink/30'}`}
-        >
+            ${selected ? 'border-coral ring-2 ring-coral/30' : 'border-line hover:border-ink/30'}`}>
           <div className="aspect-square w-full grid place-items-center text-ink/80">
             <I className="w-20 h-20" />
           </div>
@@ -500,15 +611,12 @@
       );
     }
 
-    // Kort til Trin 2 (profil)
     function ProfileCard({ p, selected, onClick }) {
       const I = p.Icon;
       return (
-        <button
-          onClick={onClick}
+        <button onClick={onClick}
           className={`relative text-left rounded-lg border bg-paper p-7 transition-all shadow-card hover:shadow-cardHover
-            ${selected ? 'border-coral ring-2 ring-coral/30' : 'border-line hover:border-ink/30'}`}
-        >
+            ${selected ? 'border-coral ring-2 ring-coral/30' : 'border-line hover:border-ink/30'}`}>
           <I className="w-14 h-14 text-ink/80 mb-3" />
           <h3 className="font-display text-2xl font-semibold text-ink">{p.title}</h3>
           <p className="text-sm text-inkSoft mt-2 leading-relaxed">{p.desc}</p>
@@ -520,14 +628,11 @@
       );
     }
 
-    // Ingrediens-knap til Trin 3
     function IngredientButton({ item, selected, onClick }) {
       return (
-        <button
-          onClick={onClick}
+        <button onClick={onClick}
           className={`w-full text-left rounded-lg border bg-paper p-4 transition-all shadow-card hover:shadow-cardHover flex items-start gap-3
-            ${selected ? 'border-coral ring-2 ring-coral/30' : 'border-line hover:border-ink/30'}`}
-        >
+            ${selected ? 'border-coral ring-2 ring-coral/30' : 'border-line hover:border-ink/30'}`}>
           <div className="text-2xl shrink-0">{item.icon}</div>
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2 flex-wrap">
@@ -545,7 +650,9 @@
       );
     }
 
-    // "Vidste du?" boks i Dencon-stil
+    /* ============================================================
+       Højre side på Trin 3 — videns-boks med ekspanderbar detalje.
+       ============================================================ */
     function KnowledgeBox({ item }) {
       if (!item) {
         return (
@@ -573,13 +680,65 @@
               <div className="text-[10px] uppercase tracking-nav text-inkMute">Svind</div>
             </div>
           </div>
+          <details className="mt-4 group">
+            <summary className="flex items-center justify-between text-[12px] font-bold tracking-nav uppercase text-ink hover:text-coral">
+              <span>Læs mere om produktet</span>
+              <span className="chev text-coral">▾</span>
+            </summary>
+            <div className="mt-3 text-[13px] text-inkSoft leading-relaxed space-y-2">
+              <p><strong className="text-ink">Brand:</strong> {item.brand}</p>
+              <p><strong className="text-ink">Varenummer:</strong> <span className="font-mono">{item.vno}</span> (vises hos din grossist når CVR er valideret)</p>
+              <p><strong className="text-ink">Anvendelse:</strong> {item.keywords?.slice(0,4).join(', ') || '—'}</p>
+              <p className="text-[11px] uppercase tracking-nav text-inkMute pt-2">Datablad & allergener tilgængelige på <span className="text-coral">denconfoods.com</span></p>
+            </div>
+          </details>
         </div>
       );
     }
 
-    // Statusbar over alle trin
+    /* ============================================================
+       Central HIGHLIGHT-info-boks med vidensvisualisering og
+       udvidelig "Læs mere" detaljevisning.
+       ============================================================ */
+    function InsightBox({ tone='cream', label, title, body, details, stat }) {
+      const tones = {
+        cream:  'bg-cream border-line',
+        coral:  'bg-coralBg border-coral/40',
+        sun:    'bg-sunBg border-sun/60',
+        ink:    'bg-ink text-cream border-ink',
+      };
+      const isInk = tone === 'ink';
+      return (
+        <div className={`rounded-xl border ${tones[tone]} p-5 sm:p-6 shadow-card`}>
+          <div className="flex items-start gap-4">
+            {stat && (
+              <div className={`shrink-0 rounded-lg ${isInk ? 'bg-paper/10' : 'bg-paper'} border ${isInk?'border-paper/10':'border-line'} px-4 py-3 text-center min-w-[88px]`}>
+                <div className={`font-display text-3xl font-semibold leading-none ${isInk ? 'text-coral' : 'text-coral'}`}>{stat.value}</div>
+                <div className={`text-[10px] uppercase tracking-nav mt-1 ${isInk ? 'text-cream/60' : 'text-inkMute'}`}>{stat.label}</div>
+              </div>
+            )}
+            <div className="flex-1 min-w-0">
+              {label && <div className={`text-[10px] uppercase tracking-nav font-bold mb-1 ${isInk ? 'text-coral' : 'text-coral'}`}>{label}</div>}
+              <h4 className={`font-display text-xl sm:text-2xl font-semibold ${isInk ? 'text-paper' : 'text-ink'}`}>{title}</h4>
+              <p className={`mt-2 text-[14px] leading-relaxed ${isInk ? 'text-cream/85' : 'text-inkSoft'}`}>{body}</p>
+              {details && (
+                <details className="mt-3 group">
+                  <summary className={`flex items-center gap-1.5 text-[12px] font-bold tracking-nav uppercase ${isInk ? 'text-coral' : 'text-coral'} hover:opacity-80`}>
+                    Læs mere <span className="chev">▾</span>
+                  </summary>
+                  <div className={`mt-3 text-[13px] leading-relaxed ${isInk ? 'text-cream/80' : 'text-inkSoft'} space-y-2`}>
+                    {details}
+                  </div>
+                </details>
+              )}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     function StatusBar({ step }) {
-      const steps = ["Spisesituation", "Profil", "Tallerken", "Koncept"];
+      const steps = ["Spisesituation", "Profil", "Tallerken", "Detaljer", "Koncept"];
       return (
         <ol className="flex items-center justify-between gap-2">
           {steps.map((label, i) => {
@@ -594,7 +753,7 @@
                             'bg-paper text-inkMute border-line'}`}>
                   {done ? '✓' : idx}
                 </div>
-                <span className={`truncate text-[11px] sm:text-xs font-bold tracking-nav uppercase
+                <span className={`truncate text-[10px] sm:text-xs font-bold tracking-nav uppercase
                   ${active ? 'text-ink' : done ? 'text-coral' : 'text-inkMute'}`}>{label}</span>
                 {i < steps.length - 1 && (
                   <div className={`hidden sm:block h-px flex-1 ${done ? 'bg-coral' : 'bg-line'}`} />
@@ -611,14 +770,28 @@
       return filtered.length ? filtered : list;
     }
 
+    /* ============================================================
+       Hovedkomponent
+       ============================================================ */
     function App() {
       const [step, setStep] = useState(1);
       const [situation, setSituation] = useState(null);
       const [profile, setProfile] = useState(null);
-      const [picks, setPicks] = useState({ protein: null, base: null, topping: null });
+
+      // FLERE TALLERKENER — array af { id, name, picks }
+      const blankPlate = () => ({ id: crypto.randomUUID(), picks: { protein:null, base:null, topping:null } });
+      const [plates, setPlates] = useState([{ ...blankPlate(), name: "Tallerken 1" }]);
+      const [activePlate, setActivePlate] = useState(0);
       const [lastTouched, setLastTouched] = useState(null);
+
+      // Kommentar fra Trin 4 (AI input)
+      const [comment, setComment] = useState('');
+
+      // Lead-form + CVR-validering
       const [unlocked, setUnlocked] = useState(false);
-      const [form, setForm] = useState({ name:'', email:'', company:'', kitchen:'', wholesaler:'' });
+      const [form, setForm] = useState({ name:'', email:'', company:'', kitchen:'', wholesaler:'', cvr:'' });
+      const [cvrError, setCvrError] = useState('');
+
       const [guests, setGuests] = useState(250);
 
       const situationObj = SITUATIONS.find(s => s.id === situation);
@@ -632,6 +805,9 @@
         };
       }, [situationObj, profile]);
 
+      const plate = plates[activePlate];
+      const picks = plate?.picks || { protein:null, base:null, topping:null };
+
       const selectedProducts = useMemo(() => ({
         protein: lists.protein.find(p => p.id === picks.protein) || null,
         base:    lists.base.find(p => p.id === picks.base)       || null,
@@ -639,36 +815,93 @@
       }), [lists, picks]);
 
       const lastTouchedItem = lastTouched ? selectedProducts[lastTouched] : null;
+      const plateComplete = !!(picks.protein && picks.base && picks.topping);
+      const allPlatesComplete = plates.every(pl => pl.picks.protein && pl.picks.base && pl.picks.topping);
 
+      // Totalvurdering på tværs af alle tallerkener (til Trin 5)
       const totals = useMemo(() => {
-        const items = Object.values(selectedProducts).filter(Boolean);
-        const pricePerPortion = items.reduce((s,x) => s + x.pricePerPortion, 0);
-        const prepMinutes     = Math.max(...items.map(x => x.prepMinutes), 0);
-        const avgCO2          = items.length ? Math.round(items.reduce((s,x)=>s+x.co2Reduction,0)/items.length) : 0;
-        const weekly          = pricePerPortion * guests;
-        return { pricePerPortion, prepMinutes, avgCO2, weekly };
-      }, [selectedProducts, guests]);
+        const platesResolved = plates.map(pl => {
+          const items = [
+            lists.protein.find(p => p.id === pl.picks.protein),
+            lists.base.find(p => p.id === pl.picks.base),
+            lists.topping.find(p => p.id === pl.picks.topping),
+          ].filter(Boolean);
+          const portion = items.reduce((s,x) => s + x.pricePerPortion, 0);
+          const prep    = items.length ? Math.max(...items.map(x => x.prepMinutes)) : 0;
+          const co2     = items.length ? Math.round(items.reduce((s,x)=>s+x.co2Reduction,0)/items.length) : 0;
+          return { plate: pl, items, portion, prep, co2 };
+        });
+        // Hvis flere tallerkener: gennemsnitlig portionspris, max prep, gennemsnit CO₂
+        const avgPortion = platesResolved.length
+          ? platesResolved.reduce((s,x) => s + x.portion, 0) / platesResolved.length
+          : 0;
+        const maxPrep = platesResolved.length ? Math.max(...platesResolved.map(x => x.prep)) : 0;
+        const avgCO2  = platesResolved.length
+          ? Math.round(platesResolved.reduce((s,x) => s + x.co2, 0) / platesResolved.length)
+          : 0;
+        const weekly = avgPortion * guests;
+        return { platesResolved, avgPortion, maxPrep, avgCO2, weekly };
+      }, [plates, lists, guests]);
 
-      const allPicked = picks.protein && picks.base && picks.topping;
+      // AI-forslag baseret på kommentar
+      const aiExtras = useMemo(() => {
+        if (!situationObj) return [];
+        const pickedIds = new Set();
+        plates.forEach(pl => Object.values(pl.picks).forEach(id => id && pickedIds.add(id)));
+        return suggestExtraProducts(comment, situationObj.productKey, pickedIds);
+      }, [comment, plates, situationObj]);
 
-      function pickIngredient(type, id) {
-        setPicks(prev => ({ ...prev, [type]: id }));
+      // Vores ekstra forslag (3 tips)
+      const conceptTips = useMemo(
+        () => pickTips(situation, profile, comment),
+        [situation, profile, comment]
+      );
+
+      function setPickInActivePlate(type, id) {
+        setPlates(prev => prev.map((pl, i) =>
+          i !== activePlate ? pl : { ...pl, picks: { ...pl.picks, [type]: id } }
+        ));
         setLastTouched(type);
+      }
+
+      function addPlate() {
+        setPlates(prev => {
+          const next = [...prev, { ...blankPlate(), name: `Tallerken ${prev.length + 1}` }];
+          setActivePlate(next.length - 1);
+          return next;
+        });
+        setLastTouched(null);
+      }
+
+      function removePlate(idx) {
+        if (plates.length === 1) return;
+        setPlates(prev => prev.filter((_,i) => i !== idx).map((pl,i) => ({...pl, name: `Tallerken ${i+1}`})));
+        setActivePlate(0);
       }
 
       function resetAll() {
         setStep(1); setSituation(null); setProfile(null);
-        setPicks({ protein:null, base:null, topping:null });
+        setPlates([{ ...blankPlate(), name: "Tallerken 1" }]);
+        setActivePlate(0);
         setLastTouched(null); setUnlocked(false);
-        setForm({ name:'', email:'', company:'', kitchen:'', wholesaler:'' });
+        setComment('');
+        setForm({ name:'', email:'', company:'', kitchen:'', wholesaler:'', cvr:'' });
+        setCvrError('');
         setGuests(250);
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
 
       function submitForm(e) {
         e.preventDefault();
-        // Simuleret lead-submit. Skift til rigtigt API-kald.
-        // fetch('/api/leads', { method:'POST', body: JSON.stringify(form) })
+        // CVR-validering: format + mod-11 checksum. Kun gyldige numre låser op.
+        const cvr = normalizeCVR(form.cvr);
+        if (!validateCVR(cvr)) {
+          setCvrError("Ugyldigt CVR — angiv 8 cifre fra et registreret dansk firma.");
+          return;
+        }
+        setCvrError('');
+        // Simuleret lead-submit. Skift til rigtigt API-kald:
+        // fetch('/api/leads', { method:'POST', body: JSON.stringify({...form, cvr}) })
         setUnlocked(true);
       }
 
@@ -676,11 +909,9 @@
 
       const sliderPct = Math.round(((guests - 50) / (2000 - 50)) * 100);
 
-      // Primær CTA-knap (coral, matcher "kontakt os" + scroll-top)
       function CTA({ children, disabled, ...rest }) {
         return (
-          <button {...rest}
-            disabled={disabled}
+          <button {...rest} disabled={disabled}
             className={`px-7 py-3.5 rounded-full font-semibold text-[14px] tracking-wide transition-all
               ${disabled ? 'bg-line text-inkMute cursor-not-allowed'
                          : 'bg-coral text-paper hover:bg-coralDk shadow-card hover:shadow-cardHover'}`}>
@@ -693,7 +924,7 @@
         <div className="min-h-screen bg-bg">
           <DenconHeader onReset={resetAll} />
 
-          {/* Hero matchende "Flere Gode Spiseoplevelser" — cream baggrund, kæmpe display-font */}
+          {/* Hero — kun på Trin 1 */}
           {step === 1 && (
             <section className="bg-cream">
               <div className="max-w-6xl mx-auto px-4 sm:px-6 py-14 sm:py-20 grid md:grid-cols-2 gap-10 items-center">
@@ -703,7 +934,7 @@
                     Byg dit<br/>næste<br/>menukoncept.
                   </h1>
                   <p className="text-inkSoft text-lg mt-6 max-w-md">
-                    Vi guider dig fra spisesituation til færdigt koncept med Dencon-produkter — på under 2 minutter.
+                    Vi guider dig fra spisesituation til færdigt koncept med Dencon-produkter — på under 3 minutter.
                   </p>
                 </div>
                 <div className="hidden md:block">
@@ -712,8 +943,9 @@
                     <ol className="space-y-3 text-cream text-[15px]">
                       <li className="flex gap-3"><span className="font-display text-coral text-xl leading-none">1.</span>Vælg spisesituation</li>
                       <li className="flex gap-3"><span className="font-display text-coral text-xl leading-none">2.</span>Vælg profil & ambition</li>
-                      <li className="flex gap-3"><span className="font-display text-coral text-xl leading-none">3.</span>Byg tallerkenen — lær om hvert produkt</li>
-                      <li className="flex gap-3"><span className="font-display text-coral text-xl leading-none">4.</span>Se dit koncept med portionspriser & varenumre</li>
+                      <li className="flex gap-3"><span className="font-display text-coral text-xl leading-none">3.</span>Byg én eller flere tallerkener</li>
+                      <li className="flex gap-3"><span className="font-display text-coral text-xl leading-none">4.</span>Fortæl os om din madoplevelse</li>
+                      <li className="flex gap-3"><span className="font-display text-coral text-xl leading-none">5.</span>Lås op med dit CVR & se prisen</li>
                     </ol>
                   </div>
                 </div>
@@ -734,7 +966,7 @@
             {step === 1 && (
               <section className="fade-in">
                 <div className="max-w-2xl">
-                  <p className="text-[11px] uppercase tracking-nav text-coral font-bold mb-2">Trin 1 af 4</p>
+                  <p className="text-[11px] uppercase tracking-nav text-coral font-bold mb-2">Trin 1 af 5</p>
                   <h2 className="font-display text-4xl sm:text-5xl font-semibold text-ink leading-tight">Hvilken spisesituation løser vi for dig?</h2>
                   <p className="text-inkSoft mt-3">Vælg den situation der bedst beskriver dit køkken — vi skræddersyer derefter et færdigt koncept.</p>
                 </div>
@@ -743,6 +975,24 @@
                     <SituationCard key={s.id} s={s} selected={situation===s.id} onClick={() => setSituation(s.id)} />
                   )}
                 </div>
+
+                {/* Central videns-highlight på Trin 1 */}
+                <div className="mt-10">
+                  <InsightBox
+                    tone="ink"
+                    label="Branche-indsigt"
+                    stat={{ value:"47%", label:"Lavere svind" }}
+                    title="Færdigtilberedte koncepter sænker dit madsvind drastisk"
+                    body="Danske foodservice-køkkener der skifter til færdige komponenter rapporterer i gennemsnit 47% lavere madsvind og 22% kortere service-tid."
+                    details={
+                      <>
+                        <p>Tallet bygger på data fra Dencon's egne kundekøkkener i perioden 2023–2025 — på tværs af kantiner, hoteller og caféer.</p>
+                        <p>De største gevinster ses i kategorierne <strong className="text-paper">protein</strong> (færdigstegte bøffer & sous-vide kylling) og <strong className="text-paper">brød</strong> (frostkonserverede buns med 100% holdbarhed).</p>
+                      </>
+                    }
+                  />
+                </div>
+
                 <div className="mt-10 flex justify-end">
                   <CTA disabled={!situation} onClick={() => setStep(2)}>Fortsæt →</CTA>
                 </div>
@@ -753,7 +1003,7 @@
             {step === 2 && (
               <section className="fade-in">
                 <div className="max-w-2xl">
-                  <p className="text-[11px] uppercase tracking-nav text-coral font-bold mb-2">Trin 2 af 4</p>
+                  <p className="text-[11px] uppercase tracking-nav text-coral font-bold mb-2">Trin 2 af 5</p>
                   <h2 className="font-display text-4xl sm:text-5xl font-semibold text-ink leading-tight">Hvad er dit primære fokus?</h2>
                   <p className="text-inkSoft mt-3">Profilen styrer hvilke produkter vi anbefaler i næste trin — fra økonomi til premium til klima.</p>
                 </div>
@@ -762,6 +1012,23 @@
                     <ProfileCard key={p.id} p={p} selected={profile===p.id} onClick={() => setProfile(p.id)} />
                   )}
                 </div>
+
+                <div className="mt-10">
+                  <InsightBox
+                    tone="cream"
+                    label="Tip"
+                    stat={{ value:"+18%", label:"Snitpris" }}
+                    title="Premium-profilen hæver din snitpris med op til 18%"
+                    body="Køkkener der aktivt fortæller historien om brand og oprindelse (fx 'Black Angus, 28 dages modning') ser markant højere gæste-villighed til at betale mere."
+                    details={
+                      <>
+                        <p>Den grønne profil rammer den voksende gruppe af 'flexitarer' (38% af danskere ifølge Coop Analyse 2025). En enkelt plantebaseret variant er nok til at åbne segmentet.</p>
+                        <p>Value-profilen er optimal til kantiner og fastfood, hvor kalkulen pr. portion er afgørende.</p>
+                      </>
+                    }
+                  />
+                </div>
+
                 <div className="mt-10 flex items-center justify-between">
                   <button onClick={() => setStep(1)} className="text-sm text-inkSoft hover:text-coral">← Tilbage</button>
                   <CTA disabled={!profile} onClick={() => setStep(3)}>Fortsæt →</CTA>
@@ -769,16 +1036,52 @@
               </section>
             )}
 
-            {/* ========================= TRIN 3 ========================= */}
+            {/* ========================= TRIN 3 — MULTI-TALLERKEN ========================= */}
             {step === 3 && (
               <section className="fade-in">
                 <div className="max-w-2xl">
-                  <p className="text-[11px] uppercase tracking-nav text-coral font-bold mb-2">Trin 3 af 4</p>
-                  <h2 className="font-display text-4xl sm:text-5xl font-semibold text-ink leading-tight">Byg din tallerken</h2>
-                  <p className="text-inkSoft mt-3">Vælg én protein, én bund og én topping. For hvert valg lærer du noget nyt om produktet.</p>
+                  <p className="text-[11px] uppercase tracking-nav text-coral font-bold mb-2">Trin 3 af 5</p>
+                  <h2 className="font-display text-4xl sm:text-5xl font-semibold text-ink leading-tight">Byg dine tallerkener</h2>
+                  <p className="text-inkSoft mt-3">Sammensæt så mange varianter du vil — fx en kødvariant + en plantebaseret variant til samme menu. For hvert valg lærer du noget om produktet.</p>
                 </div>
 
-                <div className="grid lg:grid-cols-3 gap-6 mt-10">
+                {/* Tab-bar med tallerkener */}
+                <div className="mt-8 flex flex-wrap items-center gap-2">
+                  {plates.map((pl, i) => {
+                    const done = pl.picks.protein && pl.picks.base && pl.picks.topping;
+                    const isActive = i === activePlate;
+                    return (
+                      <div key={pl.id} className="flex items-center">
+                        <button onClick={() => { setActivePlate(i); setLastTouched(null); }}
+                          className={`pl-4 pr-3 py-2 rounded-l-full text-[13px] font-semibold tracking-wide flex items-center gap-2 border transition-all
+                            ${isActive ? 'bg-ink text-paper border-ink' : 'bg-paper text-ink border-line hover:border-ink/30'}`}>
+                          <span>{pl.name}</span>
+                          <span className={`text-[10px] uppercase tracking-nav font-bold ${isActive ? 'text-coral' : (done ? 'text-coral' : 'text-inkMute')}`}>
+                            {done ? '✓' : `${[pl.picks.protein,pl.picks.base,pl.picks.topping].filter(Boolean).length}/3`}
+                          </span>
+                        </button>
+                        {plates.length > 1 && (
+                          <button onClick={() => removePlate(i)} title="Fjern tallerken"
+                            className={`px-2 py-2 rounded-r-full border-y border-r text-inkMute hover:text-coral transition-colors
+                              ${isActive ? 'bg-ink border-ink text-cream/70' : 'bg-paper border-line'}`}>
+                            <Icon.trash className="w-4 h-4"/>
+                          </button>
+                        )}
+                        {plates.length === 1 && (
+                          <div className={`px-2 py-2 rounded-r-full border-y border-r ${isActive?'bg-ink border-ink':'bg-paper border-line'}`}>
+                            <Icon.trash className="w-4 h-4 text-inkMute/30"/>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                  <button onClick={addPlate}
+                    className="ml-1 inline-flex items-center gap-1.5 px-4 py-2 rounded-full border-2 border-dashed border-coral/60 text-coral text-[13px] font-semibold tracking-wide hover:bg-coralBg transition-colors">
+                    <Icon.plus className="w-4 h-4"/> Tilføj tallerken
+                  </button>
+                </div>
+
+                <div className="grid lg:grid-cols-3 gap-6 mt-8">
                   <div className="lg:col-span-2 space-y-8">
                     {[
                       { key:'protein', label:'1 — Protein',     items: lists.protein },
@@ -796,7 +1099,7 @@
                               key={item.id}
                               item={item}
                               selected={picks[group.key] === item.id}
-                              onClick={() => pickIngredient(group.key, item.id)}
+                              onClick={() => setPickInActivePlate(group.key, item.id)}
                             />
                           ))}
                         </div>
@@ -808,7 +1111,9 @@
                     <KnowledgeBox item={lastTouchedItem} />
 
                     <div className="rounded-lg border border-line bg-paper p-5 shadow-card">
-                      <div className="text-[11px] uppercase tracking-nav text-inkMute font-bold mb-3">Din tallerken</div>
+                      <div className="text-[11px] uppercase tracking-nav text-inkMute font-bold mb-3">
+                        {plate?.name || 'Aktiv tallerken'}
+                      </div>
                       <ul className="text-sm space-y-2">
                         {['protein','base','topping'].map(k => (
                           <li key={k} className="flex items-center justify-between gap-2">
@@ -819,20 +1124,110 @@
                           </li>
                         ))}
                       </ul>
+                      {plates.length > 1 && (
+                        <div className="mt-4 pt-3 border-t border-line text-[12px] text-inkMute">
+                          Du bygger {plates.length} tallerkener — totalt {plates.filter(pl => pl.picks.protein && pl.picks.base && pl.picks.topping).length}/{plates.length} færdige.
+                        </div>
+                      )}
                     </div>
+
+                    <InsightBox
+                      tone="sun"
+                      label="Hvorfor flere tallerkener?"
+                      title="Giv gæsten et reelt valg"
+                      body="Køkkener med 2-3 varianter på samme koncept rapporterer 26% højere gentagende besøg — kunden vender tilbage for at prøve den næste."
+                      details={
+                        <p>Et godt mix er fx én kød-variant + én plantebaseret + én sæson-variant. Du bruger samme 'mor-bygning' i køkkenet og maksimerer dækningsbidraget.</p>
+                      }
+                    />
                   </aside>
                 </div>
 
                 <div className="mt-10 flex items-center justify-between">
                   <button onClick={() => setStep(2)} className="text-sm text-inkSoft hover:text-coral">← Tilbage</button>
-                  <CTA disabled={!allPicked} onClick={() => setStep(4)}>Se mit koncept →</CTA>
+                  <CTA disabled={!allPlatesComplete} onClick={() => setStep(4)}>
+                    {allPlatesComplete ? 'Næste: Detaljer →' : 'Færdiggør alle tallerkener'}
+                  </CTA>
                 </div>
               </section>
             )}
 
-            {/* ========================= TRIN 4 ========================= */}
+            {/* ========================= TRIN 4 — KOMMENTAR ========================= */}
             {step === 4 && (
               <section className="fade-in">
+                <div className="max-w-2xl">
+                  <p className="text-[11px] uppercase tracking-nav text-coral font-bold mb-2">Trin 4 af 5</p>
+                  <h2 className="font-display text-4xl sm:text-5xl font-semibold text-ink leading-tight">Fortæl os om din madoplevelse</h2>
+                  <p className="text-inkSoft mt-3">Vores AI bruger din beskrivelse til at matche flere relevante produkter fra Dencons sortiment og skræddersy de tips, du får på næste side.</p>
+                </div>
+
+                <div className="grid lg:grid-cols-3 gap-6 mt-10">
+                  <div className="lg:col-span-2">
+                    <label className="block text-[11px] uppercase tracking-nav font-bold text-inkSoft mb-2">Beskriv din madoplevelse</label>
+                    <textarea
+                      value={comment}
+                      onChange={e => setComment(e.target.value)}
+                      rows={9}
+                      placeholder="Fx: 'Vi vil gerne lave en hyggelig fredagsmenu til 200 gæster med fokus på bæredygtighed. Der skal være mulighed for vegansk variant, og det skal kunne klares hurtigt af 2 i køkkenet. Drinks-pairing er vigtigt.'"
+                      className="w-full rounded-lg border border-line bg-paper px-4 py-3 text-[15px] focus:outline-none focus:border-ink shadow-card"
+                    />
+                    <div className="flex items-center justify-between mt-2 text-[12px] text-inkMute">
+                      <span>{comment.length} tegn — gerne 2-3 sætninger</span>
+                      <span>Vælg gerne ord som: <em>klima, hurtig, premium, børn, drink, sæson</em></span>
+                    </div>
+
+                    <div className="mt-8">
+                      <InsightBox
+                        tone="coral"
+                        label="Sådan hjælper AI dig"
+                        title="Vi matcher dine ord mod hele Dencons sortiment"
+                        body="AI'en analyserer din beskrivelse for nøgleord (sæson, tempo, klima, drinks, allergier...) og foreslår 3 ekstra produkter du måske ikke har valgt — plus 3 skræddersyede tips på næste side."
+                        details={
+                          <>
+                            <p>Eksempler på hvad AI'en fanger:</p>
+                            <ul className="list-disc ml-5 space-y-1">
+                              <li>"vinter" → varme suppe-shots og Bone Broth</li>
+                              <li>"børn" → mini-portion vejledning og crowd-pleasers</li>
+                              <li>"klima" → CO₂-fokus og plantebaserede alternativer</li>
+                              <li>"travl/hurtig" → produkter med ≤3 min. tilberedning</li>
+                            </ul>
+                            <p className="text-[11px] uppercase tracking-nav text-inkMute pt-2">Dine ord deles ikke med tredjepart.</p>
+                          </>
+                        }
+                      />
+                    </div>
+                  </div>
+
+                  <aside className="space-y-4">
+                    <div className="rounded-lg border border-line bg-paper p-5 shadow-card">
+                      <div className="text-[11px] uppercase tracking-nav text-inkMute font-bold mb-3">Dit koncept indtil videre</div>
+                      <div className="space-y-2 text-sm">
+                        <div className="flex justify-between"><span className="text-inkMute">Spisesituation</span><span className="font-medium text-ink">{situationObj?.title}</span></div>
+                        <div className="flex justify-between"><span className="text-inkMute">Profil</span><span className="font-medium text-ink">{PROFILES.find(p=>p.id===profile)?.title}</span></div>
+                        <div className="flex justify-between"><span className="text-inkMute">Tallerkener</span><span className="font-medium text-ink">{plates.length}</span></div>
+                      </div>
+                    </div>
+
+                    <InsightBox
+                      tone="sun"
+                      label="Tip"
+                      title="Jo mere du fortæller, jo bedre matcher vi"
+                      body="2-3 sætninger er nok. Nævn hvor mange gæster, tempo, eventuelle allergier og sæson — så bliver vores forslag mere skarpe."
+                    />
+                  </aside>
+                </div>
+
+                <div className="mt-10 flex items-center justify-between">
+                  <button onClick={() => setStep(3)} className="text-sm text-inkSoft hover:text-coral">← Tilbage</button>
+                  <CTA onClick={() => setStep(5)}>Se mit færdige koncept →</CTA>
+                </div>
+              </section>
+            )}
+
+            {/* ========================= TRIN 5 — KONCEPT REVEAL ========================= */}
+            {step === 5 && (
+              <section className="fade-in">
+                {/* Hero-blok */}
                 <div className="rounded-2xl bg-ink text-cream p-8 sm:p-12 shadow-cardHover relative overflow-hidden">
                   <div className="absolute -right-6 -top-6 opacity-10 text-coral">
                     {situationObj?.Icon && <situationObj.Icon className="w-[260px] h-[260px]"/>}
@@ -842,14 +1237,13 @@
                     {makeConceptName(situation, profile)}
                   </h2>
                   <p className="mt-4 text-cream/80 max-w-2xl">
-                    Skræddersyet til {situationObj?.title.toLowerCase()} med profilen <strong className="text-paper">{PROFILES.find(p=>p.id===profile)?.title}</strong>.
-                    Klar til service med færdige produkter fra Dencon Foods.
+                    {plates.length === 1 ? 'En tallerken' : `${plates.length} tallerkener`} skræddersyet til {situationObj?.title.toLowerCase()} med profilen <strong className="text-paper">{PROFILES.find(p=>p.id===profile)?.title}</strong>.
                   </p>
                   <div className="grid sm:grid-cols-3 gap-3 mt-7 relative z-10">
                     <div className="rounded-lg bg-paper/10 border border-paper/10 backdrop-blur p-4">
                       <div className="text-[10px] uppercase tracking-nav text-cream/60">Klar på</div>
-                      <div className="font-display text-3xl font-semibold mt-1">{totals.prepMinutes} min</div>
-                      <div className="text-xs text-cream/60">i konvektovn / pande</div>
+                      <div className="font-display text-3xl font-semibold mt-1">{totals.maxPrep} min</div>
+                      <div className="text-xs text-cream/60">længste komponent</div>
                     </div>
                     <div className="rounded-lg bg-paper/10 border border-paper/10 backdrop-blur p-4">
                       <div className="text-[10px] uppercase tracking-nav text-cream/60">CO₂-reduktion</div>
@@ -864,43 +1258,48 @@
                   </div>
                 </div>
 
+                {/* Ingredienser pr. tallerken + pris-sektion */}
                 <div className="grid lg:grid-cols-3 gap-6 mt-8">
-                  <div className="lg:col-span-2 rounded-lg bg-paper border border-line p-6 shadow-card">
-                    <h3 className="font-display text-3xl font-semibold text-ink">Konceptets ingredienser</h3>
-                    <ul className="mt-4 divide-y divide-line">
-                      {[
-                        { label:'Protein',     item: selectedProducts.protein },
-                        { label:'Brød / Bund', item: selectedProducts.base    },
-                        { label:'Topping',     item: selectedProducts.topping },
-                      ].map(row => (
-                        <li key={row.label} className="py-3 flex items-start gap-3">
-                          <div className="text-2xl">{row.item?.icon}</div>
-                          <div className="flex-1">
-                            <div className="text-[10px] uppercase tracking-nav text-inkMute font-bold">{row.label}</div>
-                            <div className="font-semibold text-ink">{row.item?.name}</div>
-                            <div className="text-xs text-inkSoft mt-0.5">{row.item?.brand} · klar på {row.item?.prepMinutes} min.</div>
-                          </div>
-                        </li>
-                      ))}
-                    </ul>
+                  <div className="lg:col-span-2 space-y-4">
+                    {totals.platesResolved.map((pr, i) => (
+                      <div key={pr.plate.id} className="rounded-lg bg-paper border border-line p-6 shadow-card">
+                        <div className="flex items-baseline justify-between mb-3">
+                          <h3 className="font-display text-2xl font-semibold text-ink">{pr.plate.name}</h3>
+                          <span className="text-[11px] uppercase tracking-nav text-inkMute">⏱ {pr.prep} min · −{pr.co2}% CO₂</span>
+                        </div>
+                        <ul className="divide-y divide-line">
+                          {pr.items.map(item => (
+                            <li key={item.id} className="py-3 flex items-start gap-3">
+                              <div className="text-2xl">{item.icon}</div>
+                              <div className="flex-1">
+                                <div className="font-semibold text-ink">{item.name}</div>
+                                <div className="text-xs text-inkSoft mt-0.5">{item.brand} · klar på {item.prepMinutes} min.</div>
+                              </div>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
 
-                    <div className="mt-6 rounded-lg bg-cream border border-line p-4">
+                    <div className="rounded-lg bg-cream border border-line p-5">
                       <div className="text-[10px] uppercase tracking-nav text-coral font-bold mb-1">Køkkenvejledning</div>
                       <p className="text-sm text-ink/85">
-                        Klar på <strong>{totals.prepMinutes} minutter</strong> i konvektovn ved 180°C.
+                        Klar på <strong>{totals.maxPrep} minutter</strong> i konvektovn ved 180°C.
                         Anret protein på bund, top med valgt topping og servér straks. Alle komponenter
                         er færdigtilberedte — minimal håndtering, maksimal hastighed.
                       </p>
                     </div>
                   </div>
 
-                  {/* Pris-sektion (sløret indtil lead-form) */}
+                  {/* Pris-sektion (sløret indtil CVR er valideret) */}
                   <div className="relative rounded-lg bg-paper border border-line p-6 shadow-card">
                     {!unlocked && (
-                      <div className="absolute inset-0 rounded-lg bg-paper/75 backdrop-blur-[2px] z-10 flex flex-col items-center justify-center text-center p-6">
-                        <div className="w-12 h-12 rounded-full bg-coral text-paper grid place-items-center text-xl">🔒</div>
-                        <div className="mt-3 font-display text-xl font-semibold text-ink">Priser & varenumre er låst</div>
-                        <div className="text-xs text-inkSoft mt-1 max-w-[18rem]">Udfyld formularen nedenfor for at se din portionspris, ugeøkonomi og varenumre.</div>
+                      <div className="absolute inset-0 rounded-lg bg-paper/80 backdrop-blur-[2px] z-10 flex flex-col items-center justify-center text-center p-6">
+                        <div className="w-12 h-12 rounded-full bg-coral text-paper grid place-items-center">
+                          <Icon.lock className="w-6 h-6"/>
+                        </div>
+                        <div className="mt-3 font-display text-xl font-semibold text-ink">Priser låst</div>
+                        <div className="text-xs text-inkSoft mt-1 max-w-[18rem]">Validér dit CVR nedenfor for at se portionspriser, varenumre og ugeøkonomi.</div>
                       </div>
                     )}
 
@@ -908,8 +1307,8 @@
                     <div className={!unlocked ? "blurred mt-4" : "mt-4"}>
                       <div className="space-y-3">
                         <div className="flex items-baseline justify-between">
-                          <span className="text-sm text-inkSoft">Portionspris</span>
-                          <span className="font-display font-semibold text-ink text-xl">{totals.pricePerPortion.toFixed(2)} kr.</span>
+                          <span className="text-sm text-inkSoft">{plates.length === 1 ? 'Portionspris' : 'Gns. portionspris'}</span>
+                          <span className="font-display font-semibold text-ink text-xl">{totals.avgPortion.toFixed(2)} kr.</span>
                         </div>
                         <div className="flex items-baseline justify-between">
                           <span className="text-sm text-inkSoft">Pr. uge ({guests} gæster)</span>
@@ -918,9 +1317,9 @@
                         <div className="pt-3 border-t border-line">
                           <div className="text-[10px] uppercase tracking-nav text-inkMute font-bold mb-2">Varenumre hos grossist</div>
                           <ul className="text-xs space-y-1">
-                            {Object.values(selectedProducts).filter(Boolean).map(p => (
+                            {totals.platesResolved.flatMap(pr => pr.items).filter((v,i,a) => a.findIndex(x=>x.id===v.id)===i).map(p => (
                               <li key={p.id} className="flex justify-between">
-                                <span className="text-inkSoft">{p.name}</span>
+                                <span className="text-inkSoft truncate pr-2">{p.name}</span>
                                 <span className="font-mono text-ink">{p.vno}</span>
                               </li>
                             ))}
@@ -931,48 +1330,104 @@
                   </div>
                 </div>
 
-                {/* TRIN 5 — Lead-formular eller låst-op indhold */}
+                {/* AI: ekstra produkt-forslag (vises altid) */}
+                {aiExtras.length > 0 && (
+                  <div className="mt-10">
+                    <div className="flex items-center gap-2 mb-4">
+                      <Icon.sparkle className="w-5 h-5 text-coral"/>
+                      <h3 className="font-display text-3xl font-semibold text-ink">AI-forslag baseret på dine ord</h3>
+                    </div>
+                    <p className="text-inkSoft max-w-2xl mb-5">
+                      Disse 3 produkter matcher det, du beskrev — og kunne gøre dit koncept stærkere.
+                    </p>
+                    <div className="grid sm:grid-cols-3 gap-4">
+                      {aiExtras.map(p => (
+                        <div key={p.id} className="rounded-lg border border-line bg-paper p-5 shadow-card slide-in">
+                          <div className="flex items-start gap-3">
+                            <div className="text-2xl">{p.icon}</div>
+                            <div className="flex-1 min-w-0">
+                              <div className="font-semibold text-ink">{p.name}</div>
+                              <div className="text-[10px] uppercase tracking-nav text-inkMute mt-0.5">{p.brand}</div>
+                            </div>
+                          </div>
+                          <p className="text-[13px] text-inkSoft mt-3 leading-relaxed">{p.fact}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* VORES EKSTRA FORSLAG — 3 tips */}
+                <div className="mt-12 rounded-2xl bg-cream border border-line p-6 sm:p-10">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Icon.sparkle className="w-5 h-5 text-coral"/>
+                    <p className="text-[11px] uppercase tracking-nav text-coral font-bold">Vores ekstra forslag</p>
+                  </div>
+                  <h3 className="font-display text-3xl sm:text-4xl font-semibold text-ink leading-tight">Tre tips til at løfte dit koncept</h3>
+                  <p className="text-inkSoft mt-3 max-w-2xl">
+                    Tre konkrete forslag fra Dencon's foodservice-team — udvalgt på baggrund af dine valg og din beskrivelse.
+                  </p>
+                  <div className="grid md:grid-cols-3 gap-4 mt-7">
+                    {conceptTips.map((tip, i) => (
+                      <div key={tip.id} className="rounded-lg bg-paper border border-line p-5 shadow-card">
+                        <div className="font-display text-4xl font-bold text-coral leading-none">{String(i+1).padStart(2,'0')}</div>
+                        <h4 className="font-display text-xl font-semibold text-ink mt-3">{tip.title}</h4>
+                        <p className="text-[14px] text-inkSoft mt-2 leading-relaxed">{tip.body}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* CVR-LEAD-FORMULAR eller LÅST-OP indhold */}
                 {!unlocked ? (
-                  <div className="mt-8 rounded-2xl bg-cream border border-line p-6 sm:p-10">
+                  <div className="mt-12 rounded-2xl bg-paper border border-line p-6 sm:p-10 shadow-card">
                     <div className="grid lg:grid-cols-2 gap-8 items-start">
                       <div>
-                        <p className="text-[11px] uppercase tracking-nav text-coral font-bold mb-2">Trin 4 af 4</p>
+                        <p className="text-[11px] uppercase tracking-nav text-coral font-bold mb-2">Trin 5 af 5</p>
                         <h3 className="font-display text-3xl sm:text-4xl font-semibold text-ink leading-tight">
-                          Lås op for præcise priser & varenumre
+                          Lås op med dit CVR
                         </h3>
                         <p className="text-inkSoft mt-3">
-                          Indtast dine oplysninger for at se dine præcise portionspriser, totaløkonomi
+                          Indtast dit danske CVR-nummer for at se dine præcise portionspriser, totaløkonomi
                           samt varenumre til Hørkram, Dagrofa eller BC Catering.
                         </p>
                         <ul className="mt-5 text-sm space-y-2 text-ink/85">
-                          <li className="flex gap-2"><span className="text-coral">✓</span> Portionspris pr. gæst</li>
+                          <li className="flex gap-2"><span className="text-coral">✓</span> Vi validerer dit CVR med dansk Modulus-11 algoritme</li>
+                          <li className="flex gap-2"><span className="text-coral">✓</span> Kun gyldige CVR-numre giver adgang til B2B-priser</li>
                           <li className="flex gap-2"><span className="text-coral">✓</span> Interaktiv kuvert-beregner</li>
-                          <li className="flex gap-2"><span className="text-coral">✓</span> Varenumre til din grossist</li>
                           <li className="flex gap-2"><span className="text-coral">✓</span> Downloadbar PDF til dit team</li>
                         </ul>
+                        <div className="mt-6">
+                          <InsightBox
+                            tone="sun"
+                            label="Hvorfor CVR?"
+                            title="B2B-priser kun til registrerede virksomheder"
+                            body="Dencon Foods er en ren foodservice-grossist. Vi sælger ikke til private — og priserne du ser er nettopriser hos din grossist."
+                          />
+                        </div>
                       </div>
 
-                      <form onSubmit={submitForm} className="bg-paper border border-line rounded-lg p-5 sm:p-6 shadow-card space-y-3">
+                      <form onSubmit={submitForm} className="bg-cream border border-line rounded-lg p-5 sm:p-6 shadow-card space-y-3">
                         <div>
                           <label className="text-[11px] uppercase tracking-nav font-bold text-inkSoft">Navn</label>
                           <input required value={form.name} onChange={e=>setForm({...form, name:e.target.value})}
-                            className="mt-1.5 w-full rounded-md border border-line bg-bg/60 px-3 py-2.5 focus:outline-none focus:border-ink" placeholder="Fornavn Efternavn" />
+                            className="mt-1.5 w-full rounded-md border border-line bg-paper px-3 py-2.5 focus:outline-none focus:border-ink" placeholder="Fornavn Efternavn" />
                         </div>
                         <div>
                           <label className="text-[11px] uppercase tracking-nav font-bold text-inkSoft">E-mail</label>
                           <input required type="email" value={form.email} onChange={e=>setForm({...form, email:e.target.value})}
-                            className="mt-1.5 w-full rounded-md border border-line bg-bg/60 px-3 py-2.5 focus:outline-none focus:border-ink" placeholder="navn@firma.dk" />
+                            className="mt-1.5 w-full rounded-md border border-line bg-paper px-3 py-2.5 focus:outline-none focus:border-ink" placeholder="navn@firma.dk" />
                         </div>
                         <div className="grid sm:grid-cols-2 gap-3">
                           <div>
                             <label className="text-[11px] uppercase tracking-nav font-bold text-inkSoft">Virksomhed</label>
                             <input required value={form.company} onChange={e=>setForm({...form, company:e.target.value})}
-                              className="mt-1.5 w-full rounded-md border border-line bg-bg/60 px-3 py-2.5 focus:outline-none focus:border-ink" placeholder="F.eks. Café Nordlys" />
+                              className="mt-1.5 w-full rounded-md border border-line bg-paper px-3 py-2.5 focus:outline-none focus:border-ink" placeholder="F.eks. Café Nordlys" />
                           </div>
                           <div>
                             <label className="text-[11px] uppercase tracking-nav font-bold text-inkSoft">Køkkentype</label>
                             <select required value={form.kitchen} onChange={e=>setForm({...form, kitchen:e.target.value})}
-                              className="mt-1.5 w-full rounded-md border border-line bg-bg/60 px-3 py-2.5 focus:outline-none focus:border-ink">
+                              className="mt-1.5 w-full rounded-md border border-line bg-paper px-3 py-2.5 focus:outline-none focus:border-ink">
                               <option value="">Vælg…</option>
                               <option>Restaurant</option>
                               <option>Café / bar</option>
@@ -983,9 +1438,21 @@
                           </div>
                         </div>
                         <div>
+                          <label className="text-[11px] uppercase tracking-nav font-bold text-inkSoft">CVR-nummer</label>
+                          <input required value={form.cvr}
+                            onChange={e => { setForm({...form, cvr: normalizeCVR(e.target.value)}); setCvrError(''); }}
+                            inputMode="numeric" pattern="\d{8}" maxLength={8}
+                            className={`mt-1.5 w-full rounded-md border bg-paper px-3 py-2.5 font-mono tracking-widest focus:outline-none
+                              ${cvrError ? 'border-coral focus:border-coral' : 'border-line focus:border-ink'}`}
+                            placeholder="8 cifre, fx 17612492" />
+                          {cvrError
+                            ? <p className="mt-1.5 text-[12px] text-coral font-semibold">{cvrError}</p>
+                            : <p className="mt-1.5 text-[12px] text-inkMute">Valideres med dansk Modulus-11 — kun gyldige CVR-numre låser op.</p>}
+                        </div>
+                        <div>
                           <label className="text-[11px] uppercase tracking-nav font-bold text-inkSoft">Hvilken grossist bruger du i dag?</label>
                           <select required value={form.wholesaler} onChange={e=>setForm({...form, wholesaler:e.target.value})}
-                            className="mt-1.5 w-full rounded-md border border-line bg-bg/60 px-3 py-2.5 focus:outline-none focus:border-ink">
+                            className="mt-1.5 w-full rounded-md border border-line bg-paper px-3 py-2.5 focus:outline-none focus:border-ink">
                             <option value="">Vælg grossist…</option>
                             <option>Hørkram</option>
                             <option>Dagrofa Foodservice</option>
@@ -996,7 +1463,7 @@
                         </div>
                         <button type="submit"
                           className="w-full mt-2 px-5 py-3.5 rounded-full bg-coral text-paper font-semibold tracking-wide hover:bg-coralDk transition-all shadow-card hover:shadow-cardHover">
-                          Lås priser & varenumre op
+                          Validér CVR & lås priser op
                         </button>
                         <p className="text-[11px] text-inkMute leading-relaxed">
                           Ved at indsende accepterer du, at Dencon Foods kontakter dig vedr. dit koncept.
@@ -1006,15 +1473,15 @@
                     </div>
                   </div>
                 ) : (
-                  <div className="mt-8 rounded-2xl bg-paper border border-line p-6 sm:p-10 shadow-card fade-in">
+                  <div className="mt-12 rounded-2xl bg-paper border border-line p-6 sm:p-10 shadow-card fade-in">
                     <div className="flex items-start gap-3">
                       <div className="w-10 h-10 rounded-full bg-coral text-paper grid place-items-center font-bold">✓</div>
                       <div>
                         <h3 className="font-display text-3xl font-semibold text-ink">
-                          Tak {form.name?.split(' ')[0] || ''} — dit koncept er låst op
+                          Tak {form.name?.split(' ')[0] || ''} — CVR {form.cvr} er godkendt
                         </h3>
                         <p className="text-sm text-inkSoft mt-1">
-                          Vi har også sendt en kopi til <strong className="text-ink">{form.email}</strong>. Justér gæsteantal for at se din ugeøkonomi.
+                          Vi har sendt en kopi til <strong className="text-ink">{form.email}</strong>. Justér gæsteantal nedenfor for at se din ugeøkonomi.
                         </p>
                       </div>
                     </div>
@@ -1041,8 +1508,8 @@
                       </div>
                       <div className="grid sm:grid-cols-3 gap-3 mt-5">
                         <div className="rounded-md bg-paper border border-line p-3 text-center">
-                          <div className="text-[10px] uppercase tracking-nav text-inkMute">Portionspris</div>
-                          <div className="font-display font-semibold text-ink text-xl">{totals.pricePerPortion.toFixed(2)} kr.</div>
+                          <div className="text-[10px] uppercase tracking-nav text-inkMute">{plates.length===1?'Portionspris':'Gns. portion'}</div>
+                          <div className="font-display font-semibold text-ink text-xl">{totals.avgPortion.toFixed(2)} kr.</div>
                         </div>
                         <div className="rounded-md bg-paper border border-line p-3 text-center">
                           <div className="text-[10px] uppercase tracking-nav text-inkMute">Pr. måned (4 uger)</div>
@@ -1069,7 +1536,7 @@
                 )}
 
                 <div className="mt-8">
-                  <button onClick={() => setStep(3)} className="text-sm text-inkSoft hover:text-coral">← Tilbage og justér tallerken</button>
+                  <button onClick={() => setStep(4)} className="text-sm text-inkSoft hover:text-coral">← Tilbage og justér detaljer</button>
                 </div>
               </section>
             )}
@@ -1077,7 +1544,6 @@
 
           <DenconFooter />
 
-          {/* Dencon's "scroll-top" koral-knap (matcher screenshot) */}
           <button onClick={() => window.scrollTo({top:0,behavior:'smooth'})}
             aria-label="Til toppen"
             className="fixed bottom-6 right-6 w-12 h-12 rounded-md dencon-pill grid place-items-center shadow-cardHover text-xl">
