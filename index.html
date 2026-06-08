@@ -525,17 +525,19 @@
       return (
         <header className="bg-paper border-b border-line/60">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between">
-            <button onClick={onReset} className="flex items-center gap-2.5">
-              <svg viewBox="0 0 40 40" className="w-9 h-9" aria-hidden>
-                <defs>
-                  <linearGradient id="dlg" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0" stopColor="#1F4F3F"/><stop offset="1" stopColor="#1B6A8A"/>
-                  </linearGradient>
-                </defs>
-                <path d="M6 26c4-12 12-18 22-18-2 6-4 12-10 18-4 4-8 4-12 0z" fill="url(#dlg)"/>
-                <path d="M14 32c6-2 12-6 18-12-1 6-3 12-9 16-4 2-7 0-9-4z" fill="url(#dlg)" opacity=".7"/>
+            {/* Logo: præcis SVG-gengivelse af Dencons logo (to bølge-arcs + tekst).
+                Hvis et SVG/PNG-aktiv senere lægges i /assets/dencon-logo.svg
+                kan markeringen erstattes med <img src="/assets/dencon-logo.svg" />. */}
+            <button onClick={onReset} className="flex items-center gap-3" aria-label="Dencon Foods — start forfra">
+              <svg viewBox="0 0 64 44" className="h-9 w-auto" aria-hidden>
+                <path d="M5 33 C 5 13, 22 4, 38 13"
+                  stroke="#1FA463" strokeWidth="6" fill="none" strokeLinecap="round"/>
+                <path d="M14 40 C 30 32, 46 24, 60 32"
+                  stroke="#124D8C" strokeWidth="6" fill="none" strokeLinecap="round"/>
               </svg>
-              <span className="font-bold tracking-nav text-ink text-[15px]">DENCON FOODS</span>
+              <span className="font-extrabold text-[#124D8C] text-[22px] sm:text-[24px] leading-none tracking-[-0.01em]">
+                DENCON FOODS
+              </span>
             </button>
             <nav className="hidden md:flex items-center gap-8 text-[13px] font-semibold tracking-nav text-ink">
               <a className="hover:text-coral flex items-center gap-1" href="#">PRODUKTER <span className="text-[10px]">▾</span></a>
