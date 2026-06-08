@@ -13,42 +13,48 @@
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-  <!-- Google font for et professionelt B2B look -->
+  <!-- Fonts der matcher denconfoods.com (Inter til UI, Fraunces til serif-headers) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:wght@600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Fraunces:wght@500;600;700;800&display=swap" rel="stylesheet">
 
   <script>
-    // Tailwind brand-tema for Dencon Foods.
-    // Mørkegrøn primær + varm cremefarvet baggrund + accentguld.
+    /* ============================================================
+       Tailwind-tema kalibreret efter screenshots fra denconfoods.com:
+       - peach/cream hero-baggrund (#FBEDDD)
+       - dyb navy tekst (#0F1F2E)
+       - koral accent (knapper, links, scroll-top) (#E85D4F)
+       - grøn/blå logo-tones
+       Fonts: Inter (UI) + Fraunces (serif section headings, som i footer).
+       ============================================================ */
     tailwind.config = {
       theme: {
         extend: {
           colors: {
-            dencon: {
-              50:  '#f3f7f3',
-              100: '#e0ece1',
-              200: '#bcd4be',
-              300: '#8eb594',
-              400: '#5e9168',
-              500: '#3d7448',
-              600: '#2b5c37',  // primær mørkegrøn
-              700: '#22492c',
-              800: '#1c3a25',
-              900: '#15291b',
-            },
-            cream:  '#FBF7F0',
-            sand:   '#F1E9DA',
-            gold:   '#C9A24B',
-            ink:    '#0F1A14',
+            cream:    '#FBEDDD',   // hero/baggrund (varm peach)
+            bg:       '#FAF6EF',   // sektion baggrund
+            paper:    '#FFFFFF',
+            ink:      '#0F1F2E',   // primær tekst + navy
+            inkSoft:  '#3A4A58',
+            inkMute:  '#6A7682',
+            line:     '#E5DCC9',   // beige border
+            lineSoft: '#EFE7D6',
+            coral:    '#E85D4F',   // accent (CTA / links / scroll-top)
+            coralDk:  '#C9483B',
+            forest:   '#1F4F3F',   // mørkegrøn (fra logo)
+            ocean:    '#1B6A8A',   // blå (fra logo)
+            footer:   '#0B1922',   // bundfooter
           },
           fontFamily: {
-            sans: ['Inter', 'ui-sans-serif', 'system-ui'],
+            sans:    ['Inter', 'ui-sans-serif', 'system-ui'],
             display: ['Fraunces', 'ui-serif', 'Georgia'],
           },
           boxShadow: {
-            card: '0 1px 2px rgba(15,26,20,.04), 0 8px 24px rgba(15,26,20,.06)',
-            cardHover: '0 1px 2px rgba(15,26,20,.06), 0 16px 40px rgba(15,26,20,.10)',
+            card: '0 1px 2px rgba(15,31,46,.04), 0 10px 28px rgba(15,31,46,.06)',
+            cardHover: '0 2px 4px rgba(15,31,46,.06), 0 20px 44px rgba(15,31,46,.10)',
+          },
+          letterSpacing: {
+            nav: '0.18em',
           },
         }
       }
@@ -56,35 +62,43 @@
   </script>
 
   <style>
-    html, body { background: #FBF7F0; }
-    body { font-family: 'Inter', system-ui, sans-serif; color: #0F1A14; }
-    .font-display { font-family: 'Fraunces', Georgia, serif; }
+    html, body { background: #FAF6EF; }
+    body { font-family: 'Inter', system-ui, sans-serif; color: #0F1F2E; }
+    .font-display { font-family: 'Fraunces', Georgia, serif; font-feature-settings: "ss01"; }
     .blurred { filter: blur(7px); user-select: none; pointer-events: none; }
     .fade-in { animation: fadeIn .35s ease both; }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(6px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
+    @keyframes fadeIn { from { opacity:0; transform:translateY(6px);} to { opacity:1; transform:translateY(0);} }
     .pop { animation: pop .25s ease both; }
-    @keyframes pop {
-      0%   { opacity: 0; transform: scale(.96); }
-      100% { opacity: 1; transform: scale(1); }
-    }
-    /* Pænere range-slider på tværs af browsere */
+    @keyframes pop { 0%{opacity:0; transform:scale(.96);} 100%{opacity:1; transform:scale(1);} }
+
+    /* Pænere range-slider i Dencon-stil */
     input[type=range] {
       -webkit-appearance: none; height: 6px; border-radius: 999px;
-      background: linear-gradient(to right, #2b5c37 var(--p,50%), #e0ece1 var(--p,50%));
+      background: linear-gradient(to right, #0F1F2E var(--p,50%), #E5DCC9 var(--p,50%));
       outline: none;
     }
     input[type=range]::-webkit-slider-thumb {
       -webkit-appearance: none; appearance: none;
       width: 22px; height: 22px; border-radius: 50%;
-      background: #fff; border: 3px solid #2b5c37; cursor: pointer;
+      background: #fff; border: 3px solid #E85D4F; cursor: pointer;
       box-shadow: 0 2px 6px rgba(0,0,0,.15);
     }
     input[type=range]::-moz-range-thumb {
       width: 22px; height: 22px; border-radius: 50%;
-      background: #fff; border: 3px solid #2b5c37; cursor: pointer;
+      background: #fff; border: 3px solid #E85D4F; cursor: pointer;
+    }
+
+    /* Dencon "scroll-top" coral knap-look (dekorativ) */
+    .dencon-pill {
+      background:#E85D4F; color:#fff;
+    }
+
+    /* Logo gradient (grøn-blå mark fra deres screenshot) */
+    .logo-mark {
+      background: linear-gradient(135deg, #1F4F3F 0%, #1B6A8A 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
     }
   </style>
 </head>
@@ -95,55 +109,68 @@
     const { useState, useMemo, useEffect } = React;
 
     /* ============================================================
-       DATA — let at udskifte med rigtige Dencon-produkter senere.
-       Hvert produkt har: id, name, brand, vno (varenummer),
-       pricePerPortion (DKK), prepMinutes, co2Reduction (%),
-       wasteReduction (%), fact (uddannelses-tekst), icon (emoji).
+       PRODUKTDATA — bygget på Dencons egne brands (Big Al's,
+       Black Angus, Prime, Flame-Grilled, Plant Food Nordic,
+       Bakers Choice, Nordic Catch, Dencon Reserve, Bone Broth).
+       Felter: id, name, brand, vno, pricePerPortion, prepMinutes,
+       co2Reduction (%), wasteReduction (%), fact, icon, tags.
+       Let at swappe med ægte Dencon-data senere.
        ============================================================ */
     const PRODUCTS = {
-      // ---- PROTEIN ----
       protein: {
         burger: [
-          { id: 'p-bigal',   name: "Big Al's Færdigstegt Bøf 150g", brand: "Big Al's", vno: "DF-10412",
+          { id: 'p-bigal',   name: "Big Al's Flame-Grilled Patty 150g", brand: "Big Al's", vno: "DF-10412",
             pricePerPortion: 14.50, prepMinutes: 3, wasteReduction: 100, co2Reduction: 0,
-            fact: "Færdigstegt og frostklar — reducerer dit svind til 0% og sparer ca. 15 min. tilberedningstid pr. service.",
+            fact: "Flammegrillet og færdigstegt. Servér direkte fra ovn på 3 min. — 0% svind og ca. 15 min. sparet tilberedningstid pr. service.",
             icon: "🥩", tags: ['value','premium'] },
-          { id: 'p-angus',   name: "Black Angus Prime Patty 180g", brand: "Dencon Reserve", vno: "DF-10488",
+          { id: 'p-angus',   name: "Black Angus Burger Patty 180g", brand: "Big Al's", vno: "DF-10488",
             pricePerPortion: 22.00, prepMinutes: 6, wasteReduction: 80, co2Reduction: 0,
-            fact: "Modnet 28 dage. Giver storytelling på menukortet og en højere snitpris pr. burger.",
+            fact: "100% Black Angus oksekød — saftig, mør og med tydelig storytelling der hæver snitprisen på din menu.",
             icon: "🥩", tags: ['premium'] },
-          { id: 'p-oumph',   name: "Oumph! Plant Patty 140g", brand: "Oumph!", vno: "DF-20231",
+          { id: 'p-prime',   name: "Prime Burger Patty 160g", brand: "Big Al's", vno: "DF-10522",
+            pricePerPortion: 17.50, prepMinutes: 5, wasteReduction: 90, co2Reduction: 0,
+            fact: "Prime-kvalitet med karakteristisk saftighed. Sweet spot mellem pris og premium-oplevelse.",
+            icon: "🥩", tags: ['premium','value'] },
+          { id: 'p-plant',   name: "Plant Food Nordic Patty 140g", brand: "Plant Food Nordic", vno: "DF-20231",
             pricePerPortion: 12.90, prepMinutes: 3, wasteReduction: 100, co2Reduction: 72,
-            fact: "Reducerer rettens CO2-aftryk med op til 72% sammenlignet med traditionel oksekødsbøf.",
+            fact: "Plantebaseret bøf med op til 72% lavere CO₂-aftryk end traditionel oksekødsbøf. Steges og smager som kød.",
             icon: "🌱", tags: ['value','green'] },
         ],
         moede: [
           { id: 'p-chick',   name: "Pulled Chicken Sous Vide 1kg", brand: "Dencon Kitchen", vno: "DF-30911",
             pricePerPortion: 9.75, prepMinutes: 4, wasteReduction: 95, co2Reduction: 0,
-            fact: "Færdigtilberedt sous vide. Kan opvarmes direkte i pose — minimerer servicestress.",
+            fact: "Færdigtilberedt sous vide. Opvarmes direkte i pose — minimerer servicestress på travle mødedage.",
             icon: "🍗", tags: ['value','premium'] },
           { id: 'p-salm',    name: "Røget Laks Skiveskåret 500g", brand: "Nordic Catch", vno: "DF-31204",
             pricePerPortion: 18.20, prepMinutes: 1, wasteReduction: 100, co2Reduction: 0,
-            fact: "Skiveskåret og portionsklar. Sparer 20 min. forberedelse pr. mødebuffet.",
+            fact: "Skiveskåret og portionsklar. Sparer 20 min. forberedelse pr. mødebuffet og giver perfekte snit hver gang.",
             icon: "🐟", tags: ['premium'] },
-          { id: 'p-falaf',   name: "Krydret Falafel Mini 1kg", brand: "Plant Food", vno: "DF-20488",
+          { id: 'p-falaf',   name: "Krydret Falafel Mini 1kg", brand: "Plant Food Nordic", vno: "DF-20488",
             pricePerPortion: 6.40, prepMinutes: 5, wasteReduction: 100, co2Reduction: 65,
-            fact: "Plantebaseret protein-bombe — 65% lavere CO2 end kødfyld og holder i buffeten i op til 2 timer.",
+            fact: "Plantebaseret protein-bombe — 65% lavere CO₂ end kødfyld og holder formen i buffeten i op til 2 timer.",
             icon: "🌱", tags: ['value','green'] },
+          { id: 'p-broth',   name: "Bone Broth Klassisk 500ml", brand: "Bone Broth", vno: "DF-90122",
+            pricePerPortion: 7.80, prepMinutes: 2, wasteReduction: 100, co2Reduction: 0,
+            fact: "Langtidssimret som mormors fond. Klar til at servere som varm shot eller base til soup-bowl på mødet.",
+            icon: "🍲", tags: ['premium','green'] },
         ],
         groen: [
-          { id: 'p-oumph2',  name: "Oumph! Pulled Filets 1kg", brand: "Oumph!", vno: "DF-20122",
+          { id: 'p-plant2',  name: "Plant Food Nordic Pulled 1kg", brand: "Plant Food Nordic", vno: "DF-20122",
             pricePerPortion: 11.20, prepMinutes: 4, wasteReduction: 100, co2Reduction: 70,
-            fact: "Op til 70% lavere CO2-aftryk vs. oksekød. Optager smag fra marinader på under 10 minutter.",
+            fact: "Op til 70% lavere CO₂-aftryk vs. oksekød. Optager marinade-smag på under 10 minutter.",
             icon: "🌱", tags: ['green','value'] },
-          { id: 'p-tempeh',  name: "Marineret Tempeh Strips 800g", brand: "Plant Food", vno: "DF-20355",
+          { id: 'p-tempeh',  name: "Marineret Tempeh Strips 800g", brand: "Plant Food Nordic", vno: "DF-20355",
             pricePerPortion: 13.80, prepMinutes: 5, wasteReduction: 100, co2Reduction: 78,
-            fact: "Fermenteret sojaprotein — højt proteinindhold og 78% lavere CO2 end traditionel kylling.",
+            fact: "Fermenteret sojaprotein med højt proteinindhold. 78% lavere CO₂ end traditionel kylling.",
             icon: "🌱", tags: ['green','premium'] },
-          { id: 'p-jack',    name: "Pulled Jackfruit BBQ 1kg", brand: "Plant Food", vno: "DF-20399",
+          { id: 'p-jack',    name: "Pulled Jackfruit BBQ 1kg", brand: "Plant Food Nordic", vno: "DF-20399",
             pricePerPortion: 9.10, prepMinutes: 3, wasteReduction: 100, co2Reduction: 82,
-            fact: "Klar på 3 min. Lige til en taco, wrap eller bowl med autentisk pulled-tekstur.",
+            fact: "Klar på 3 min. til taco, wrap eller bowl. Autentisk pulled-tekstur og 82% lavere klima-aftryk.",
             icon: "🌱", tags: ['green','value'] },
+          { id: 'p-beans',   name: "Belugalinser Færdigkogte 2kg", brand: "Plant Food Nordic", vno: "DF-20612",
+            pricePerPortion: 5.60, prepMinutes: 1, wasteReduction: 100, co2Reduction: 88,
+            fact: "Bælgfrugter har et af de laveste CO₂-aftryk pr. gram protein — 88% lavere end oksekød.",
+            icon: "🫘", tags: ['green','value'] },
         ],
         tapas: [
           { id: 'p-cho',     name: "Chorizo Iberico Slices 500g", brand: "Dencon Reserve", vno: "DF-41203",
@@ -152,15 +179,14 @@
             icon: "🥓", tags: ['premium'] },
           { id: 'p-meatb',   name: "Mini Meatballs Crispy 1kg", brand: "Big Al's", vno: "DF-10599",
             pricePerPortion: 7.20, prepMinutes: 4, wasteReduction: 100, co2Reduction: 0,
-            fact: "Færdigstegte og frostklare — 4 min. i ovn og klar til servering.",
+            fact: "Færdigstegte og frostklare — 4 min. i konvektovn og klar til servering på bar-snack platte.",
             icon: "🍖", tags: ['value'] },
-          { id: 'p-haloum',  name: "Halloumi Sticks Panerede 800g", brand: "Plant Food", vno: "DF-20612",
+          { id: 'p-haloum',  name: "Halloumi Sticks Panerede 800g", brand: "Plant Food Nordic", vno: "DF-20612",
             pricePerPortion: 9.40, prepMinutes: 4, wasteReduction: 100, co2Reduction: 55,
-            fact: "Vegetarisk crowd-pleaser med 55% lavere CO2 end kød-tapas.",
+            fact: "Vegetarisk crowd-pleaser med 55% lavere CO₂ end kød-tapas. Stegt på 4 min.",
             icon: "🧀", tags: ['green','premium'] },
         ],
       },
-      // ---- BRØD / BUND ----
       base: {
         burger: [
           { id: 'b-brioche', name: "Brioche Bun Premium 90g", brand: "Bakers Choice", vno: "DF-50122",
@@ -169,7 +195,7 @@
             icon: "🍞", tags: ['premium','value'] },
           { id: 'b-pot',     name: "Potato Bun Sourdough 85g", brand: "Bakers Choice", vno: "DF-50188",
             pricePerPortion: 4.80, prepMinutes: 1, wasteReduction: 100, co2Reduction: 10,
-            fact: "Surdejshævet — giver dybere smag og holder formen under saftige toppings.",
+            fact: "Surdejshævet — giver dybere smag og holder formen under saftige toppings og sauce.",
             icon: "🥖", tags: ['premium'] },
           { id: 'b-glufri',  name: "Glutenfri Bun 80g", brand: "Bakers Choice", vno: "DF-50301",
             pricePerPortion: 6.10, prepMinutes: 1, wasteReduction: 100, co2Reduction: 0,
@@ -179,7 +205,7 @@
         moede: [
           { id: 'b-wrap',    name: "Hvedetortilla 25cm (24 stk)", brand: "Bakers Choice", vno: "DF-50455",
             pricePerPortion: 2.30, prepMinutes: 1, wasteReduction: 100, co2Reduction: 0,
-            fact: "Lang holdbarhed — minimerer brød-spild til 0% i mødecateringen.",
+            fact: "Lang holdbarhed — minimerer brød-svind til 0% i mødecateringen.",
             icon: "🌯", tags: ['value','premium','green'] },
           { id: 'b-rug',     name: "Rugbrødsskiver Skiveskåret", brand: "Bakers Choice", vno: "DF-50488",
             pricePerPortion: 1.80, prepMinutes: 0, wasteReduction: 100, co2Reduction: 5,
@@ -191,9 +217,9 @@
             icon: "🥖", tags: ['premium','value'] },
         ],
         groen: [
-          { id: 'b-quinoa',  name: "Quinoa & Bønne-Bowl Base 2kg", brand: "Plant Food", vno: "DF-60122",
+          { id: 'b-quinoa',  name: "Quinoa & Bønne-Bowl Base 2kg", brand: "Plant Food Nordic", vno: "DF-60122",
             pricePerPortion: 6.20, prepMinutes: 2, wasteReduction: 100, co2Reduction: 60,
-            fact: "Færdigkogt, blot opvarm. 60% lavere CO2 end ris-baseret bowl.",
+            fact: "Færdigkogt — blot opvarm. 60% lavere CO₂ end ris-baseret bowl.",
             icon: "🥣", tags: ['green','value'] },
           { id: 'b-flat',    name: "Fuldkorns Flatbread 90g", brand: "Bakers Choice", vno: "DF-50601",
             pricePerPortion: 3.40, prepMinutes: 1, wasteReduction: 100, co2Reduction: 15,
@@ -201,7 +227,7 @@
             icon: "🫓", tags: ['green','premium','value'] },
           { id: 'b-sweet',   name: "Sweet Potato Wedges 2kg", brand: "Dencon Kitchen", vno: "DF-60204",
             pricePerPortion: 4.10, prepMinutes: 8, wasteReduction: 100, co2Reduction: 25,
-            fact: "Forskåret og forfriturestegt. Klar til ovn — sparer 12 min. forberedelse.",
+            fact: "Forskåret og forfriturestegt. Klar til ovn — sparer 12 min. forberedelse pr. portion.",
             icon: "🍠", tags: ['green','premium'] },
         ],
         tapas: [
@@ -211,7 +237,7 @@
             icon: "🥖", tags: ['value','premium'] },
           { id: 'b-pita',    name: "Mini Pita 40g (40 stk)", brand: "Bakers Choice", vno: "DF-50755",
             pricePerPortion: 2.10, prepMinutes: 2, wasteReduction: 100, co2Reduction: 0,
-            fact: "Lommen åbnes nemt og fyldes — perfekt finger-mad format.",
+            fact: "Lommen åbnes nemt og fyldes — perfekt finger-mad format til bar og event.",
             icon: "🫓", tags: ['value','green'] },
           { id: 'b-bli',     name: "Blinis Mini Russian 15g (60 stk)", brand: "Nordic Catch", vno: "DF-50811",
             pricePerPortion: 2.80, prepMinutes: 1, wasteReduction: 100, co2Reduction: 0,
@@ -219,7 +245,6 @@
             icon: "🥞", tags: ['premium'] },
         ],
       },
-      // ---- TOPPING ----
       topping: {
         burger: [
           { id: 't-truf',    name: "Trøffel-Aioli 500ml", brand: "Dencon Reserve", vno: "DF-70123",
@@ -228,17 +253,17 @@
             icon: "🫒", tags: ['premium'] },
           { id: 't-bbq',     name: "Smokey BBQ Sauce 1L", brand: "Big Al's", vno: "DF-70188",
             pricePerPortion: 0.90, prepMinutes: 0, wasteReduction: 100, co2Reduction: 0,
-            fact: "Lang holdbarhed efter åbning (4 uger) — eliminerer sauce-svind.",
+            fact: "Lang holdbarhed efter åbning (4 uger) — eliminerer sauce-svind i køkkenet.",
             icon: "🍶", tags: ['value'] },
-          { id: 't-veg',     name: "Vegansk Cheddar Slices 1kg", brand: "Plant Food", vno: "DF-20801",
+          { id: 't-veg',     name: "Vegansk Cheddar Slices 1kg", brand: "Plant Food Nordic", vno: "DF-20801",
             pricePerPortion: 2.30, prepMinutes: 0, wasteReduction: 100, co2Reduction: 60,
             fact: "Smelter som ægte cheddar — gør hele burgeren 100% plantebaseret.",
             icon: "🧀", tags: ['green','value'] },
         ],
         moede: [
-          { id: 't-husk',    name: "Hummus Klassisk 1kg", brand: "Plant Food", vno: "DF-20911",
+          { id: 't-husk',    name: "Hummus Klassisk 1kg", brand: "Plant Food Nordic", vno: "DF-20911",
             pricePerPortion: 1.60, prepMinutes: 0, wasteReduction: 100, co2Reduction: 50,
-            fact: "Plantebaseret crowd-pleaser. 50% lavere CO2 end traditionel remoulade.",
+            fact: "Plantebaseret crowd-pleaser. 50% lavere CO₂ end traditionel remoulade.",
             icon: "🥣", tags: ['green','value','premium'] },
           { id: 't-pic',     name: "Hjemmestil Pickles Sortiment", brand: "Dencon Kitchen", vno: "DF-71022",
             pricePerPortion: 1.20, prepMinutes: 0, wasteReduction: 100, co2Reduction: 0,
@@ -250,11 +275,11 @@
             icon: "🌿", tags: ['premium'] },
         ],
         groen: [
-          { id: 't-tahini',  name: "Tahini-Citron Dressing 1L", brand: "Plant Food", vno: "DF-21055",
+          { id: 't-tahini',  name: "Tahini-Citron Dressing 1L", brand: "Plant Food Nordic", vno: "DF-21055",
             pricePerPortion: 1.40, prepMinutes: 0, wasteReduction: 100, co2Reduction: 55,
-            fact: "Klimavenlig dressing med 55% lavere CO2 end fløde-baserede dressinger.",
+            fact: "Klimavenlig dressing med 55% lavere CO₂ end fløde-baserede dressinger.",
             icon: "🥗", tags: ['green','value'] },
-          { id: 't-feta',    name: "Vegansk 'Feta' i tern 1kg", brand: "Plant Food", vno: "DF-21099",
+          { id: 't-feta',    name: "Vegansk 'Feta' i tern 1kg", brand: "Plant Food Nordic", vno: "DF-21099",
             pricePerPortion: 2.90, prepMinutes: 0, wasteReduction: 100, co2Reduction: 65,
             fact: "Helt plantebaseret. Smuldrer og smager autentisk over bowls og salater.",
             icon: "🧀", tags: ['green','premium'] },
@@ -272,7 +297,7 @@
             pricePerPortion: 1.30, prepMinutes: 0, wasteReduction: 100, co2Reduction: 0,
             fact: "Holdbarhed på 4 uger åbnet — nul svind på dipsaucer.",
             icon: "🌶️", tags: ['value','premium'] },
-          { id: 't-cara',    name: "Karameliserede Valnødder 500g", brand: "Plant Food", vno: "DF-21222",
+          { id: 't-cara',    name: "Karameliserede Valnødder 500g", brand: "Plant Food Nordic", vno: "DF-21222",
             pricePerPortion: 1.90, prepMinutes: 0, wasteReduction: 100, co2Reduction: 30,
             fact: "Vegansk crunch der færdiggør plade-præsentationen med en premium feel.",
             icon: "🌰", tags: ['green','premium'] },
@@ -280,28 +305,88 @@
       },
     };
 
-    // De fire spisesituationer
+    /* ============================================================
+       SVG line icons til de fire spisesituationer — matcher den
+       tynde stregstil på denconfoods.com/produkter (kategoriikoner).
+       ============================================================ */
+    const Icon = {
+      burger: (p) => (
+        <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" {...p}>
+          <path d="M10 28c2-9 11-14 22-14s20 5 22 14"/>
+          <path d="M10 28h44"/>
+          <path d="M10 36c0 2 2 4 4 4h36c2 0 4-2 4-4"/>
+          <path d="M10 44c0 4 4 6 8 6h28c4 0 8-2 8-6"/>
+          <circle cx="20" cy="22" r="1.2" fill="currentColor"/>
+          <circle cx="32" cy="20" r="1.2" fill="currentColor"/>
+          <circle cx="44" cy="22" r="1.2" fill="currentColor"/>
+        </svg>
+      ),
+      meeting: (p) => (
+        <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" {...p}>
+          <path d="M8 26h32l4 4h12v18a4 4 0 0 1-4 4H12a4 4 0 0 1-4-4V26z"/>
+          <path d="M20 26V18a4 4 0 0 1 4-4h16a4 4 0 0 1 4 4v8"/>
+          <path d="M22 38h20"/>
+        </svg>
+      ),
+      green: (p) => (
+        <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" {...p}>
+          <path d="M32 54c12-2 20-12 20-26 0-6-2-10-2-10s-10 0-16 6c-3 3-4 7-4 11"/>
+          <path d="M32 54c-12-2-20-12-20-26 0-6 2-10 2-10s10 0 16 6c3 3 4 7 4 11"/>
+          <path d="M32 54V28"/>
+        </svg>
+      ),
+      tapas: (p) => (
+        <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" {...p}>
+          <path d="M14 16h22l-1 10a10 10 0 0 1-20 0z"/>
+          <path d="M25 36v14"/>
+          <path d="M18 50h14"/>
+          <path d="M44 14c4 0 6 3 6 6s-2 6-6 6"/>
+          <path d="M44 26v24"/>
+          <path d="M40 50h8"/>
+        </svg>
+      ),
+      bolt: (p) => (
+        <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" {...p}>
+          <path d="M34 8 14 36h14l-4 20 22-30H32l2-18z"/>
+        </svg>
+      ),
+      diamond: (p) => (
+        <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" {...p}>
+          <path d="M14 24 32 8l18 16-18 32z"/>
+          <path d="M14 24h36"/>
+          <path d="M24 24l8 32 8-32"/>
+        </svg>
+      ),
+      leaf: (p) => (
+        <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" {...p}>
+          <path d="M52 12c-22 0-36 12-36 30 0 6 2 10 2 10s14 0 24-10c8-8 10-22 10-30z"/>
+          <path d="M16 52 36 32"/>
+        </svg>
+      ),
+    };
+
+    // De fire spisesituationer (med matching SVG-ikoner)
     const SITUATIONS = [
-      { id: 'burger', title: "Burger & Fastfood",      icon: "🍔",
+      { id: 'burger', title: "Burger & Fastfood",      Icon: Icon.burger,
         desc: "Hurtig service, høj snitpris, klassisk burger-format.", productKey: "burger" },
-      { id: 'moede',  title: "Møde & Konference",       icon: "🥪",
+      { id: 'moede',  title: "Møde & Konference",       Icon: Icon.meeting,
         desc: "Fingermad, wraps og let buffet til mødedagen.",          productKey: "moede"  },
-      { id: 'groen',  title: "Den Grønne Dag",          icon: "🌱",
-        desc: "Plantebaseret fokus — sænk dit CO2-aftryk.",             productKey: "groen"  },
-      { id: 'tapas',  title: "Tapas & Bar-snacks",      icon: "🍷",
+      { id: 'groen',  title: "Den Grønne Dag",          Icon: Icon.green,
+        desc: "Plantebaseret fokus — sænk dit CO₂-aftryk.",             productKey: "groen"  },
+      { id: 'tapas',  title: "Tapas & Bar-snacks",      Icon: Icon.tapas,
         desc: "Små, lækre bidder til bar, café og event.",              productKey: "tapas"  },
     ];
 
     // De tre profiler / ambitionsniveauer
     const PROFILES = [
-      { id: 'value',   title: "Value & Speed",     icon: "⚡",
+      { id: 'value',   title: "Value & Speed",     Icon: Icon.bolt,
         desc: "Lav tilberedningstid og skarp økonomi pr. portion.",
         tagline: "Lavt svind. Højt tempo." },
-      { id: 'premium', title: "Premium & Gourmet", icon: "✨",
+      { id: 'premium', title: "Premium & Gourmet", Icon: Icon.diamond,
         desc: "Eksklusive råvarer og storytelling på menukortet.",
         tagline: "Hæv snitprisen. Sælg historien." },
-      { id: 'green',   title: "Det Bevidste Valg", icon: "🌍",
-        desc: "CO2-reduktion og plantebaserede alternativer.",
+      { id: 'green',   title: "Det Bevidste Valg", Icon: Icon.leaf,
+        desc: "CO₂-reduktion og plantebaserede alternativer.",
         tagline: "Mindre aftryk. Mere mening." },
     ];
 
@@ -316,95 +401,176 @@
       return map[situationId]?.[profileId] || "Dit Dencon Koncept";
     }
 
-    // Lille kort til Trin 1
+    /* ============================================================
+       Top-nav matchende denconfoods.com (logo + nav-links + flag)
+       ============================================================ */
+    function DenconHeader({ onReset }) {
+      return (
+        <header className="bg-paper border-b border-line/60">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between">
+            <button onClick={onReset} className="flex items-center gap-2.5">
+              <svg viewBox="0 0 40 40" className="w-9 h-9" aria-hidden>
+                <defs>
+                  <linearGradient id="dlg" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0" stopColor="#1F4F3F"/><stop offset="1" stopColor="#1B6A8A"/>
+                  </linearGradient>
+                </defs>
+                <path d="M6 26c4-12 12-18 22-18-2 6-4 12-10 18-4 4-8 4-12 0z" fill="url(#dlg)"/>
+                <path d="M14 32c6-2 12-6 18-12-1 6-3 12-9 16-4 2-7 0-9-4z" fill="url(#dlg)" opacity=".7"/>
+              </svg>
+              <span className="font-bold tracking-nav text-ink text-[15px]">DENCON FOODS</span>
+            </button>
+            <nav className="hidden md:flex items-center gap-8 text-[13px] font-semibold tracking-nav text-ink">
+              <a className="hover:text-coral flex items-center gap-1" href="#">PRODUKTER <span className="text-[10px]">▾</span></a>
+              <a className="hover:text-coral" href="#">OPSKRIFTER</a>
+              <a className="hover:text-coral" href="#">OM OS</a>
+              <a className="hover:text-coral" href="#">KONTAKT</a>
+              <span className="text-base" title="Dansk">🇩🇰</span>
+            </nav>
+            <button onClick={onReset} className="md:hidden text-xs font-semibold tracking-nav text-ink/60">START FORFRA</button>
+          </div>
+        </header>
+      );
+    }
+
+    /* ============================================================
+       Footer matchende denconfoods.com (serif-headers, navy bund)
+       ============================================================ */
+    function DenconFooter() {
+      const cats = ["Okse","Gris","Lam","And","Kylling","Andet fjerkræ","Bacon","Fastfood","Ost","Bælgfrugter & plantebaseret","Brød og kager","Bone Broth"];
+      return (
+        <footer className="mt-20">
+          <div className="bg-bg border-t border-line/60">
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 py-14 grid md:grid-cols-3 gap-10">
+              <div>
+                <h3 className="font-display text-3xl font-semibold text-ink mb-6">Produkter</h3>
+                <div className="grid grid-cols-2 gap-y-3 text-[15px] text-inkSoft">
+                  {cats.map(c => <a key={c} href="#" className="hover:text-coral">{c}</a>)}
+                </div>
+              </div>
+              <div>
+                <h3 className="font-display text-3xl font-semibold text-ink mb-6">Information</h3>
+                <ul className="space-y-3 text-[15px] text-inkSoft">
+                  <li><a href="#" className="hover:text-coral">Om os</a></li>
+                  <li><a href="#" className="hover:text-coral">Kontakt</a></li>
+                  <li><a href="#" className="hover:text-coral">Sitemap</a></li>
+                </ul>
+              </div>
+              <div>
+                <h3 className="font-display text-3xl font-semibold text-ink mb-6">Kontakt</h3>
+                <ul className="space-y-3 text-[15px] text-inkSoft">
+                  <li>+45 74 53 43 55</li>
+                  <li>Finlandsvej 16</li>
+                  <li>6100 Haderslev</li>
+                  <li>CVR: 17612492</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div className="bg-footer text-cream/70">
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 flex flex-col items-center gap-6">
+              <div className="flex items-center gap-6">
+                <span aria-hidden className="text-2xl">f</span>
+                <span aria-hidden className="text-2xl">◉</span>
+                <span aria-hidden className="text-2xl">▶</span>
+              </div>
+              <div className="text-xs text-cream/50">© Dencon Foods A/S · Foodservice partner siden 1995</div>
+            </div>
+          </div>
+        </footer>
+      );
+    }
+
+    // Kort til Trin 1 (spisesituation) — hvidt kort, tyndt linje-ikon, label nedenunder
     function SituationCard({ s, selected, onClick }) {
+      const I = s.Icon;
       return (
         <button
           onClick={onClick}
-          className={`group text-left rounded-2xl border transition-all p-5 sm:p-6 bg-white shadow-card hover:shadow-cardHover
-            ${selected ? 'border-dencon-600 ring-2 ring-dencon-600/30' : 'border-sand hover:border-dencon-300'}`}
+          className={`group text-left rounded-lg border bg-paper p-6 transition-all shadow-card hover:shadow-cardHover
+            ${selected ? 'border-coral ring-2 ring-coral/30' : 'border-line hover:border-ink/30'}`}
         >
-          <div className="text-4xl mb-3">{s.icon}</div>
-          <h3 className="font-display text-xl font-bold text-dencon-800">{s.title}</h3>
-          <p className="text-sm text-ink/70 mt-1">{s.desc}</p>
-          <div className={`mt-4 text-xs font-semibold inline-flex items-center gap-1
-            ${selected ? 'text-dencon-600' : 'text-ink/40 group-hover:text-dencon-500'}`}>
-            {selected ? '✓ Valgt' : 'Vælg →'}
+          <div className="aspect-square w-full grid place-items-center text-ink/80">
+            <I className="w-20 h-20" />
           </div>
+          <h3 className="font-display text-xl font-semibold text-ink text-center mt-2">{s.title}</h3>
+          <p className="text-[13px] text-inkSoft text-center mt-1.5 leading-relaxed">{s.desc}</p>
+          {selected && <div className="mt-3 text-center text-[11px] font-bold tracking-nav text-coral">✓ VALGT</div>}
         </button>
       );
     }
 
-    // Lille kort til Trin 2 (profil)
+    // Kort til Trin 2 (profil)
     function ProfileCard({ p, selected, onClick }) {
+      const I = p.Icon;
       return (
         <button
           onClick={onClick}
-          className={`relative text-left rounded-2xl border transition-all p-6 bg-white shadow-card hover:shadow-cardHover
-            ${selected ? 'border-dencon-600 ring-2 ring-dencon-600/30' : 'border-sand hover:border-dencon-300'}`}
+          className={`relative text-left rounded-lg border bg-paper p-7 transition-all shadow-card hover:shadow-cardHover
+            ${selected ? 'border-coral ring-2 ring-coral/30' : 'border-line hover:border-ink/30'}`}
         >
-          <div className="text-4xl mb-2">{p.icon}</div>
-          <h3 className="font-display text-xl font-bold text-dencon-800">{p.title}</h3>
-          <p className="text-sm text-ink/70 mt-1">{p.desc}</p>
-          <p className="mt-3 text-xs uppercase tracking-wider text-gold font-semibold">{p.tagline}</p>
+          <I className="w-14 h-14 text-ink/80 mb-3" />
+          <h3 className="font-display text-2xl font-semibold text-ink">{p.title}</h3>
+          <p className="text-sm text-inkSoft mt-2 leading-relaxed">{p.desc}</p>
+          <p className="mt-4 text-[11px] uppercase tracking-nav text-coral font-bold">{p.tagline}</p>
           {selected && (
-            <span className="absolute top-4 right-4 text-xs font-bold text-white bg-dencon-600 px-2 py-1 rounded-full">VALGT</span>
+            <span className="absolute top-4 right-4 text-[10px] font-bold tracking-nav text-paper bg-coral px-2 py-1 rounded-full">VALGT</span>
           )}
         </button>
       );
     }
 
-    // Ingrediens-valg knap til Trin 3
+    // Ingrediens-knap til Trin 3
     function IngredientButton({ item, selected, onClick }) {
       return (
         <button
           onClick={onClick}
-          className={`w-full text-left rounded-xl border bg-white p-4 transition-all shadow-card hover:shadow-cardHover flex items-start gap-3
-            ${selected ? 'border-dencon-600 ring-2 ring-dencon-600/30' : 'border-sand hover:border-dencon-300'}`}
+          className={`w-full text-left rounded-lg border bg-paper p-4 transition-all shadow-card hover:shadow-cardHover flex items-start gap-3
+            ${selected ? 'border-coral ring-2 ring-coral/30' : 'border-line hover:border-ink/30'}`}
         >
           <div className="text-2xl shrink-0">{item.icon}</div>
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="font-semibold text-dencon-800">{item.name}</span>
-              <span className="text-[10px] tracking-wider uppercase text-ink/50 bg-cream border border-sand px-2 py-0.5 rounded-full">{item.brand}</span>
+              <span className="font-semibold text-ink">{item.name}</span>
+              <span className="text-[10px] tracking-nav uppercase text-inkMute bg-bg border border-line px-2 py-0.5 rounded-full">{item.brand}</span>
             </div>
-            <div className="mt-1 text-xs text-ink/60 flex flex-wrap gap-x-3 gap-y-1">
+            <div className="mt-1 text-xs text-inkSoft flex flex-wrap gap-x-3 gap-y-1">
               <span>⏱ {item.prepMinutes} min</span>
-              {item.co2Reduction > 0 && <span>🌱 -{item.co2Reduction}% CO₂</span>}
+              {item.co2Reduction > 0 && <span className="text-forest">🌱 −{item.co2Reduction}% CO₂</span>}
               {item.wasteReduction >= 95 && <span>♻️ ~0% svind</span>}
             </div>
           </div>
-          {selected && <div className="text-dencon-600 font-bold text-lg">✓</div>}
+          {selected && <div className="text-coral font-bold text-lg">✓</div>}
         </button>
       );
     }
 
-    // "Vidste du?" boks
+    // "Vidste du?" boks i Dencon-stil
     function KnowledgeBox({ item }) {
       if (!item) {
         return (
-          <div className="rounded-2xl border border-dashed border-dencon-300 bg-cream/60 p-5 text-sm text-ink/60">
-            <div className="font-semibold text-dencon-700 mb-1">💡 Vidste du?</div>
+          <div className="rounded-lg border border-dashed border-line bg-cream/60 p-5 text-sm text-inkSoft">
+            <div className="font-display font-semibold text-ink text-lg mb-1">Vidste du?</div>
             Vælg en ingrediens for at se hvordan den sparer dig tid, svind og CO₂.
           </div>
         );
       }
       return (
-        <div key={item.id} className="pop rounded-2xl border border-dencon-200 bg-gradient-to-br from-cream to-white p-5 shadow-card">
-          <div className="text-xs uppercase tracking-wider text-gold font-bold mb-2">💡 Vidste du?</div>
-          <p className="text-sm text-ink/80 leading-relaxed">{item.fact}</p>
-          <div className="grid grid-cols-3 gap-2 mt-4">
-            <div className="rounded-lg bg-white border border-sand p-2 text-center">
-              <div className="text-base font-bold text-dencon-700">{item.prepMinutes}m</div>
-              <div className="text-[10px] uppercase tracking-wider text-ink/50">Tilberedning</div>
+        <div key={item.id} className="pop rounded-lg border border-line bg-cream p-5 shadow-card">
+          <div className="text-[11px] uppercase tracking-nav text-coral font-bold mb-2">Vidste du?</div>
+          <p className="text-[15px] text-ink/90 leading-relaxed font-medium">{item.fact}</p>
+          <div className="grid grid-cols-3 gap-2 mt-5">
+            <div className="rounded-md bg-paper border border-line p-2 text-center">
+              <div className="font-display text-xl font-semibold text-ink">{item.prepMinutes}m</div>
+              <div className="text-[10px] uppercase tracking-nav text-inkMute">Tilberedning</div>
             </div>
-            <div className="rounded-lg bg-white border border-sand p-2 text-center">
-              <div className="text-base font-bold text-dencon-700">-{item.co2Reduction}%</div>
-              <div className="text-[10px] uppercase tracking-wider text-ink/50">CO₂</div>
+            <div className="rounded-md bg-paper border border-line p-2 text-center">
+              <div className="font-display text-xl font-semibold text-forest">−{item.co2Reduction}%</div>
+              <div className="text-[10px] uppercase tracking-nav text-inkMute">CO₂</div>
             </div>
-            <div className="rounded-lg bg-white border border-sand p-2 text-center">
-              <div className="text-base font-bold text-dencon-700">-{100-item.wasteReduction === 0 ? 100 : item.wasteReduction}%</div>
-              <div className="text-[10px] uppercase tracking-wider text-ink/50">Svind</div>
+            <div className="rounded-md bg-paper border border-line p-2 text-center">
+              <div className="font-display text-xl font-semibold text-ink">−{item.wasteReduction}%</div>
+              <div className="text-[10px] uppercase tracking-nav text-inkMute">Svind</div>
             </div>
           </div>
         </div>
@@ -415,51 +581,46 @@
     function StatusBar({ step }) {
       const steps = ["Spisesituation", "Profil", "Tallerken", "Koncept"];
       return (
-        <div className="w-full">
-          <ol className="flex items-center justify-between gap-2">
-            {steps.map((label, i) => {
-              const idx = i + 1;
-              const done = step > idx;
-              const active = step === idx;
-              return (
-                <li key={label} className="flex-1 flex items-center gap-2 min-w-0">
-                  <div className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold border-2 transition-all
-                    ${done ? 'bg-dencon-600 text-white border-dencon-600' :
-                      active ? 'bg-white text-dencon-700 border-dencon-600' :
-                              'bg-white text-ink/40 border-sand'}`}>
-                    {done ? '✓' : idx}
-                  </div>
-                  <span className={`truncate text-xs sm:text-sm font-medium
-                    ${active ? 'text-dencon-800' : done ? 'text-dencon-600' : 'text-ink/40'}`}>{label}</span>
-                  {i < steps.length - 1 && (
-                    <div className={`hidden sm:block h-px flex-1 ${done ? 'bg-dencon-600' : 'bg-sand'}`} />
-                  )}
-                </li>
-              );
-            })}
-          </ol>
-        </div>
+        <ol className="flex items-center justify-between gap-2">
+          {steps.map((label, i) => {
+            const idx = i + 1;
+            const done = step > idx;
+            const active = step === idx;
+            return (
+              <li key={label} className="flex-1 flex items-center gap-2 min-w-0">
+                <div className={`shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-[12px] font-bold border transition-all
+                  ${done ? 'bg-coral text-paper border-coral' :
+                    active ? 'bg-paper text-ink border-ink' :
+                            'bg-paper text-inkMute border-line'}`}>
+                  {done ? '✓' : idx}
+                </div>
+                <span className={`truncate text-[11px] sm:text-xs font-bold tracking-nav uppercase
+                  ${active ? 'text-ink' : done ? 'text-coral' : 'text-inkMute'}`}>{label}</span>
+                {i < steps.length - 1 && (
+                  <div className={`hidden sm:block h-px flex-1 ${done ? 'bg-coral' : 'bg-line'}`} />
+                )}
+              </li>
+            );
+          })}
+        </ol>
       );
     }
 
-    // Filtrér produkter ud fra valgt profil (tags)
     function filterByProfile(list, profileId) {
-      // Hvis profilen ikke findes som tag, vis alle (defensiv default).
       const filtered = list.filter(p => p.tags?.includes(profileId));
       return filtered.length ? filtered : list;
     }
 
     function App() {
       const [step, setStep] = useState(1);
-      const [situation, setSituation] = useState(null);   // id
-      const [profile, setProfile] = useState(null);       // id
+      const [situation, setSituation] = useState(null);
+      const [profile, setProfile] = useState(null);
       const [picks, setPicks] = useState({ protein: null, base: null, topping: null });
-      const [lastTouched, setLastTouched] = useState(null); // hvilken type blev senest valgt → knowledge-box
+      const [lastTouched, setLastTouched] = useState(null);
       const [unlocked, setUnlocked] = useState(false);
       const [form, setForm] = useState({ name:'', email:'', company:'', kitchen:'', wholesaler:'' });
-      const [guests, setGuests] = useState(250); // gæster pr. uge (kuvertberegner)
+      const [guests, setGuests] = useState(250);
 
-      // Brug situation+profil til at finde de tre lister
       const situationObj = SITUATIONS.find(s => s.id === situation);
       const lists = useMemo(() => {
         if (!situationObj || !profile) return { protein: [], base: [], topping: [] };
@@ -471,7 +632,6 @@
         };
       }, [situationObj, profile]);
 
-      // Selected produkter (fulde objekter)
       const selectedProducts = useMemo(() => ({
         protein: lists.protein.find(p => p.id === picks.protein) || null,
         base:    lists.base.find(p => p.id === picks.base)       || null,
@@ -480,7 +640,6 @@
 
       const lastTouchedItem = lastTouched ? selectedProducts[lastTouched] : null;
 
-      // Sum-værdier til økonomi-sektionen
       const totals = useMemo(() => {
         const items = Object.values(selectedProducts).filter(Boolean);
         const pricePerPortion = items.reduce((s,x) => s + x.pricePerPortion, 0);
@@ -513,61 +672,79 @@
         setUnlocked(true);
       }
 
-      // Auto-scroll til top ved trin-skift
       useEffect(() => { window.scrollTo({ top: 0, behavior: 'smooth' }); }, [step]);
 
-      // Range-slider visuel fill
       const sliderPct = Math.round(((guests - 50) / (2000 - 50)) * 100);
 
+      // Primær CTA-knap (coral, matcher "kontakt os" + scroll-top)
+      function CTA({ children, disabled, ...rest }) {
+        return (
+          <button {...rest}
+            disabled={disabled}
+            className={`px-7 py-3.5 rounded-full font-semibold text-[14px] tracking-wide transition-all
+              ${disabled ? 'bg-line text-inkMute cursor-not-allowed'
+                         : 'bg-coral text-paper hover:bg-coralDk shadow-card hover:shadow-cardHover'}`}>
+            {children}
+          </button>
+        );
+      }
+
       return (
-        <div className="min-h-screen">
-          {/* Top bar */}
-          <header className="bg-dencon-700 text-white">
-            <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg bg-cream flex items-center justify-center text-dencon-700 font-display font-extrabold">D</div>
+        <div className="min-h-screen bg-bg">
+          <DenconHeader onReset={resetAll} />
+
+          {/* Hero matchende "Flere Gode Spiseoplevelser" — cream baggrund, kæmpe display-font */}
+          {step === 1 && (
+            <section className="bg-cream">
+              <div className="max-w-6xl mx-auto px-4 sm:px-6 py-14 sm:py-20 grid md:grid-cols-2 gap-10 items-center">
                 <div>
-                  <div className="text-sm font-semibold tracking-wide">DENCON FOODS</div>
-                  <div className="text-[11px] text-cream/70 -mt-0.5">B2B Foodservice · Koncept-Byggeren</div>
+                  <p className="text-[11px] uppercase tracking-nav text-coral font-bold mb-4">Koncept-Byggeren</p>
+                  <h1 className="font-display font-bold text-ink leading-[0.95] text-5xl sm:text-6xl lg:text-7xl">
+                    Byg dit<br/>næste<br/>menukoncept.
+                  </h1>
+                  <p className="text-inkSoft text-lg mt-6 max-w-md">
+                    Vi guider dig fra spisesituation til færdigt koncept med Dencon-produkter — på under 2 minutter.
+                  </p>
+                </div>
+                <div className="hidden md:block">
+                  <div className="rounded-lg bg-ink text-cream p-8 shadow-card">
+                    <div className="text-[11px] uppercase tracking-nav text-cream/60 mb-3">Sådan virker det</div>
+                    <ol className="space-y-3 text-cream text-[15px]">
+                      <li className="flex gap-3"><span className="font-display text-coral text-xl leading-none">1.</span>Vælg spisesituation</li>
+                      <li className="flex gap-3"><span className="font-display text-coral text-xl leading-none">2.</span>Vælg profil & ambition</li>
+                      <li className="flex gap-3"><span className="font-display text-coral text-xl leading-none">3.</span>Byg tallerkenen — lær om hvert produkt</li>
+                      <li className="flex gap-3"><span className="font-display text-coral text-xl leading-none">4.</span>Se dit koncept med portionspriser & varenumre</li>
+                    </ol>
+                  </div>
                 </div>
               </div>
-              <button onClick={resetAll} className="text-xs sm:text-sm text-cream/80 hover:text-white underline underline-offset-4">
-                Start forfra
-              </button>
-            </div>
-          </header>
+            </section>
+          )}
 
-          {/* Status bar */}
-          <div className="bg-white border-b border-sand sticky top-0 z-10">
+          {/* Statusbar */}
+          <div className="bg-paper border-y border-line/60 sticky top-0 z-10">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3">
               <StatusBar step={step} />
             </div>
           </div>
 
-          <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+          <main className="max-w-6xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
 
             {/* ========================= TRIN 1 ========================= */}
             {step === 1 && (
               <section className="fade-in">
                 <div className="max-w-2xl">
-                  <p className="text-xs uppercase tracking-widest text-gold font-bold mb-2">Trin 1 af 4</p>
-                  <h1 className="font-display text-3xl sm:text-4xl font-bold text-dencon-800">Hvilken spisesituation løser vi for dig?</h1>
-                  <p className="text-ink/70 mt-2">Vælg den situation der bedst beskriver dit køkken — vi skræddersyer derefter et færdigt koncept til dig.</p>
+                  <p className="text-[11px] uppercase tracking-nav text-coral font-bold mb-2">Trin 1 af 4</p>
+                  <h2 className="font-display text-4xl sm:text-5xl font-semibold text-ink leading-tight">Hvilken spisesituation løser vi for dig?</h2>
+                  <p className="text-inkSoft mt-3">Vælg den situation der bedst beskriver dit køkken — vi skræddersyer derefter et færdigt koncept.</p>
                 </div>
-                <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
+                <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-10">
                   {SITUATIONS.map(s =>
                     <SituationCard key={s.id} s={s} selected={situation===s.id} onClick={() => setSituation(s.id)} />
                   )}
                 </div>
-                <div className="mt-8 flex justify-end">
-                  <button
-                    disabled={!situation}
-                    onClick={() => setStep(2)}
-                    className={`px-6 py-3 rounded-xl font-semibold transition-all
-                      ${situation ? 'bg-dencon-600 text-white hover:bg-dencon-700 shadow-card hover:shadow-cardHover'
-                                  : 'bg-sand text-ink/40 cursor-not-allowed'}`}>
-                    Fortsæt →
-                  </button>
+                <div className="mt-10 flex justify-end">
+                  <CTA disabled={!situation} onClick={() => setStep(2)}>Fortsæt →</CTA>
                 </div>
               </section>
             )}
@@ -576,25 +753,18 @@
             {step === 2 && (
               <section className="fade-in">
                 <div className="max-w-2xl">
-                  <p className="text-xs uppercase tracking-widest text-gold font-bold mb-2">Trin 2 af 4</p>
-                  <h1 className="font-display text-3xl sm:text-4xl font-bold text-dencon-800">Hvad er dit primære fokus?</h1>
-                  <p className="text-ink/70 mt-2">Profilen styrer hvilke produkter vi anbefaler i næste trin — fra økonomi til premium til klima.</p>
+                  <p className="text-[11px] uppercase tracking-nav text-coral font-bold mb-2">Trin 2 af 4</p>
+                  <h2 className="font-display text-4xl sm:text-5xl font-semibold text-ink leading-tight">Hvad er dit primære fokus?</h2>
+                  <p className="text-inkSoft mt-3">Profilen styrer hvilke produkter vi anbefaler i næste trin — fra økonomi til premium til klima.</p>
                 </div>
-                <div className="grid sm:grid-cols-3 gap-4 mt-8">
+                <div className="grid sm:grid-cols-3 gap-4 mt-10">
                   {PROFILES.map(p =>
                     <ProfileCard key={p.id} p={p} selected={profile===p.id} onClick={() => setProfile(p.id)} />
                   )}
                 </div>
-                <div className="mt-8 flex items-center justify-between">
-                  <button onClick={() => setStep(1)} className="text-sm text-ink/60 hover:text-dencon-700">← Tilbage</button>
-                  <button
-                    disabled={!profile}
-                    onClick={() => setStep(3)}
-                    className={`px-6 py-3 rounded-xl font-semibold transition-all
-                      ${profile ? 'bg-dencon-600 text-white hover:bg-dencon-700 shadow-card hover:shadow-cardHover'
-                                : 'bg-sand text-ink/40 cursor-not-allowed'}`}>
-                    Fortsæt →
-                  </button>
+                <div className="mt-10 flex items-center justify-between">
+                  <button onClick={() => setStep(1)} className="text-sm text-inkSoft hover:text-coral">← Tilbage</button>
+                  <CTA disabled={!profile} onClick={() => setStep(3)}>Fortsæt →</CTA>
                 </div>
               </section>
             )}
@@ -603,25 +773,24 @@
             {step === 3 && (
               <section className="fade-in">
                 <div className="max-w-2xl">
-                  <p className="text-xs uppercase tracking-widest text-gold font-bold mb-2">Trin 3 af 4</p>
-                  <h1 className="font-display text-3xl sm:text-4xl font-bold text-dencon-800">Byg din tallerken</h1>
-                  <p className="text-ink/70 mt-2">Vælg én protein, én bund og én topping. For hvert valg lærer du noget nyt om produktet.</p>
+                  <p className="text-[11px] uppercase tracking-nav text-coral font-bold mb-2">Trin 3 af 4</p>
+                  <h2 className="font-display text-4xl sm:text-5xl font-semibold text-ink leading-tight">Byg din tallerken</h2>
+                  <p className="text-inkSoft mt-3">Vælg én protein, én bund og én topping. For hvert valg lærer du noget nyt om produktet.</p>
                 </div>
 
-                <div className="grid lg:grid-cols-3 gap-6 mt-8">
-                  {/* Venstre: ingrediens-vælgere (2 kol bredde) */}
-                  <div className="lg:col-span-2 space-y-6">
+                <div className="grid lg:grid-cols-3 gap-6 mt-10">
+                  <div className="lg:col-span-2 space-y-8">
                     {[
-                      { key:'protein', label:'1 · Protein',     items: lists.protein },
-                      { key:'base',    label:'2 · Brød / Bund', items: lists.base    },
-                      { key:'topping', label:'3 · Topping',     items: lists.topping },
+                      { key:'protein', label:'1 — Protein',     items: lists.protein },
+                      { key:'base',    label:'2 — Brød / Bund', items: lists.base    },
+                      { key:'topping', label:'3 — Topping',     items: lists.topping },
                     ].map(group => (
                       <div key={group.key}>
                         <div className="flex items-baseline justify-between mb-3">
-                          <h2 className="font-display text-xl font-bold text-dencon-800">{group.label}</h2>
-                          {picks[group.key] && <span className="text-xs text-dencon-600 font-semibold">✓ Valgt</span>}
+                          <h3 className="font-display text-2xl font-semibold text-ink">{group.label}</h3>
+                          {picks[group.key] && <span className="text-[11px] uppercase tracking-nav text-coral font-bold">✓ Valgt</span>}
                         </div>
-                        <div className="grid sm:grid-cols-1 gap-3">
+                        <div className="grid gap-3">
                           {group.items.map(item => (
                             <IngredientButton
                               key={item.id}
@@ -635,18 +804,16 @@
                     ))}
                   </div>
 
-                  {/* Højre: sticky Vidste du-boks */}
                   <aside className="lg:sticky lg:top-24 self-start space-y-4">
                     <KnowledgeBox item={lastTouchedItem} />
 
-                    {/* Mini-summering */}
-                    <div className="rounded-2xl border border-sand bg-white p-5 shadow-card">
-                      <div className="text-xs uppercase tracking-wider text-ink/50 font-bold mb-3">Din tallerken</div>
+                    <div className="rounded-lg border border-line bg-paper p-5 shadow-card">
+                      <div className="text-[11px] uppercase tracking-nav text-inkMute font-bold mb-3">Din tallerken</div>
                       <ul className="text-sm space-y-2">
                         {['protein','base','topping'].map(k => (
                           <li key={k} className="flex items-center justify-between gap-2">
-                            <span className="capitalize text-ink/60">{k === 'base' ? 'Bund' : k === 'protein' ? 'Protein' : 'Topping'}</span>
-                            <span className={`text-right font-medium ${selectedProducts[k] ? 'text-dencon-800' : 'text-ink/30'}`}>
+                            <span className="text-inkMute">{k === 'base' ? 'Bund' : k === 'protein' ? 'Protein' : 'Topping'}</span>
+                            <span className={`text-right font-medium ${selectedProducts[k] ? 'text-ink' : 'text-inkMute/60'}`}>
                               {selectedProducts[k]?.name || '— ikke valgt'}
                             </span>
                           </li>
@@ -656,16 +823,9 @@
                   </aside>
                 </div>
 
-                <div className="mt-8 flex items-center justify-between">
-                  <button onClick={() => setStep(2)} className="text-sm text-ink/60 hover:text-dencon-700">← Tilbage</button>
-                  <button
-                    disabled={!allPicked}
-                    onClick={() => setStep(4)}
-                    className={`px-6 py-3 rounded-xl font-semibold transition-all
-                      ${allPicked ? 'bg-dencon-600 text-white hover:bg-dencon-700 shadow-card hover:shadow-cardHover'
-                                  : 'bg-sand text-ink/40 cursor-not-allowed'}`}>
-                    Se mit koncept →
-                  </button>
+                <div className="mt-10 flex items-center justify-between">
+                  <button onClick={() => setStep(2)} className="text-sm text-inkSoft hover:text-coral">← Tilbage</button>
+                  <CTA disabled={!allPicked} onClick={() => setStep(4)}>Se mit koncept →</CTA>
                 </div>
               </section>
             )}
@@ -673,59 +833,60 @@
             {/* ========================= TRIN 4 ========================= */}
             {step === 4 && (
               <section className="fade-in">
-                <div className="rounded-3xl bg-gradient-to-br from-dencon-700 to-dencon-800 text-white p-8 sm:p-12 shadow-cardHover relative overflow-hidden">
-                  <div className="absolute -right-10 -top-10 text-[180px] opacity-10 select-none">{situationObj?.icon}</div>
-                  <p className="text-xs uppercase tracking-widest text-gold font-bold mb-3">Dit Dencon-koncept</p>
-                  <h1 className="font-display text-3xl sm:text-5xl font-bold leading-tight">
+                <div className="rounded-2xl bg-ink text-cream p-8 sm:p-12 shadow-cardHover relative overflow-hidden">
+                  <div className="absolute -right-6 -top-6 opacity-10 text-coral">
+                    {situationObj?.Icon && <situationObj.Icon className="w-[260px] h-[260px]"/>}
+                  </div>
+                  <p className="text-[11px] uppercase tracking-nav text-coral font-bold mb-3">Dit Dencon-koncept</p>
+                  <h2 className="font-display text-4xl sm:text-6xl font-semibold leading-[1.02]">
                     {makeConceptName(situation, profile)}
-                  </h1>
-                  <p className="mt-3 text-cream/80 max-w-2xl">
-                    Skræddersyet til {situationObj?.title.toLowerCase()} med profilen <strong className="text-white">{PROFILES.find(p=>p.id===profile)?.title}</strong>.
+                  </h2>
+                  <p className="mt-4 text-cream/80 max-w-2xl">
+                    Skræddersyet til {situationObj?.title.toLowerCase()} med profilen <strong className="text-paper">{PROFILES.find(p=>p.id===profile)?.title}</strong>.
                     Klar til service med færdige produkter fra Dencon Foods.
                   </p>
-                  <div className="grid sm:grid-cols-3 gap-3 mt-6">
-                    <div className="rounded-xl bg-white/10 backdrop-blur p-4">
-                      <div className="text-[11px] uppercase tracking-wider text-cream/70">Klar på</div>
-                      <div className="text-2xl font-bold">{totals.prepMinutes} min</div>
-                      <div className="text-xs text-cream/70">i konvektovn / pande</div>
+                  <div className="grid sm:grid-cols-3 gap-3 mt-7 relative z-10">
+                    <div className="rounded-lg bg-paper/10 border border-paper/10 backdrop-blur p-4">
+                      <div className="text-[10px] uppercase tracking-nav text-cream/60">Klar på</div>
+                      <div className="font-display text-3xl font-semibold mt-1">{totals.prepMinutes} min</div>
+                      <div className="text-xs text-cream/60">i konvektovn / pande</div>
                     </div>
-                    <div className="rounded-xl bg-white/10 backdrop-blur p-4">
-                      <div className="text-[11px] uppercase tracking-wider text-cream/70">CO₂-reduktion</div>
-                      <div className="text-2xl font-bold">-{totals.avgCO2}%</div>
-                      <div className="text-xs text-cream/70">gns. pr. komponent</div>
+                    <div className="rounded-lg bg-paper/10 border border-paper/10 backdrop-blur p-4">
+                      <div className="text-[10px] uppercase tracking-nav text-cream/60">CO₂-reduktion</div>
+                      <div className="font-display text-3xl font-semibold mt-1">−{totals.avgCO2}%</div>
+                      <div className="text-xs text-cream/60">gns. pr. komponent</div>
                     </div>
-                    <div className="rounded-xl bg-white/10 backdrop-blur p-4">
-                      <div className="text-[11px] uppercase tracking-wider text-cream/70">Svind</div>
-                      <div className="text-2xl font-bold">~0%</div>
-                      <div className="text-xs text-cream/70">færdigtilberedte komponenter</div>
+                    <div className="rounded-lg bg-paper/10 border border-paper/10 backdrop-blur p-4">
+                      <div className="text-[10px] uppercase tracking-nav text-cream/60">Svind</div>
+                      <div className="font-display text-3xl font-semibold mt-1">~0%</div>
+                      <div className="text-xs text-cream/60">færdigtilberedte komponenter</div>
                     </div>
                   </div>
                 </div>
 
-                {/* Ingredienser + køkkenvejledning */}
                 <div className="grid lg:grid-cols-3 gap-6 mt-8">
-                  <div className="lg:col-span-2 rounded-2xl bg-white border border-sand p-6 shadow-card">
-                    <h2 className="font-display text-2xl font-bold text-dencon-800">Konceptets ingredienser</h2>
-                    <ul className="mt-4 divide-y divide-sand">
+                  <div className="lg:col-span-2 rounded-lg bg-paper border border-line p-6 shadow-card">
+                    <h3 className="font-display text-3xl font-semibold text-ink">Konceptets ingredienser</h3>
+                    <ul className="mt-4 divide-y divide-line">
                       {[
-                        { label:'Protein', item: selectedProducts.protein },
-                        { label:'Brød / Bund', item: selectedProducts.base },
-                        { label:'Topping', item: selectedProducts.topping },
+                        { label:'Protein',     item: selectedProducts.protein },
+                        { label:'Brød / Bund', item: selectedProducts.base    },
+                        { label:'Topping',     item: selectedProducts.topping },
                       ].map(row => (
                         <li key={row.label} className="py-3 flex items-start gap-3">
                           <div className="text-2xl">{row.item?.icon}</div>
                           <div className="flex-1">
-                            <div className="text-[11px] uppercase tracking-wider text-ink/50 font-semibold">{row.label}</div>
-                            <div className="font-semibold text-dencon-800">{row.item?.name}</div>
-                            <div className="text-xs text-ink/60 mt-0.5">{row.item?.brand} · klar på {row.item?.prepMinutes} min.</div>
+                            <div className="text-[10px] uppercase tracking-nav text-inkMute font-bold">{row.label}</div>
+                            <div className="font-semibold text-ink">{row.item?.name}</div>
+                            <div className="text-xs text-inkSoft mt-0.5">{row.item?.brand} · klar på {row.item?.prepMinutes} min.</div>
                           </div>
                         </li>
                       ))}
                     </ul>
 
-                    <div className="mt-6 rounded-xl bg-cream border border-sand p-4">
-                      <div className="text-[11px] uppercase tracking-wider text-gold font-bold mb-1">Køkkenvejledning</div>
-                      <p className="text-sm text-ink/80">
+                    <div className="mt-6 rounded-lg bg-cream border border-line p-4">
+                      <div className="text-[10px] uppercase tracking-nav text-coral font-bold mb-1">Køkkenvejledning</div>
+                      <p className="text-sm text-ink/85">
                         Klar på <strong>{totals.prepMinutes} minutter</strong> i konvektovn ved 180°C.
                         Anret protein på bund, top med valgt topping og servér straks. Alle komponenter
                         er færdigtilberedte — minimal håndtering, maksimal hastighed.
@@ -734,33 +895,33 @@
                   </div>
 
                   {/* Pris-sektion (sløret indtil lead-form) */}
-                  <div className="relative rounded-2xl bg-white border border-sand p-6 shadow-card">
+                  <div className="relative rounded-lg bg-paper border border-line p-6 shadow-card">
                     {!unlocked && (
-                      <div className="absolute inset-0 rounded-2xl bg-white/70 backdrop-blur-[2px] z-10 flex flex-col items-center justify-center text-center p-6">
-                        <div className="text-3xl">🔒</div>
-                        <div className="mt-2 font-semibold text-dencon-800">Priser og varenumre er låst</div>
-                        <div className="text-xs text-ink/60 mt-1 max-w-[18rem]">Udfyld formularen nedenfor for at se din portionspris, ugeøkonomi og varenumre.</div>
+                      <div className="absolute inset-0 rounded-lg bg-paper/75 backdrop-blur-[2px] z-10 flex flex-col items-center justify-center text-center p-6">
+                        <div className="w-12 h-12 rounded-full bg-coral text-paper grid place-items-center text-xl">🔒</div>
+                        <div className="mt-3 font-display text-xl font-semibold text-ink">Priser & varenumre er låst</div>
+                        <div className="text-xs text-inkSoft mt-1 max-w-[18rem]">Udfyld formularen nedenfor for at se din portionspris, ugeøkonomi og varenumre.</div>
                       </div>
                     )}
 
-                    <h2 className="font-display text-xl font-bold text-dencon-800">Økonomi & priser</h2>
+                    <h3 className="font-display text-2xl font-semibold text-ink">Økonomi & priser</h3>
                     <div className={!unlocked ? "blurred mt-4" : "mt-4"}>
                       <div className="space-y-3">
                         <div className="flex items-baseline justify-between">
-                          <span className="text-sm text-ink/60">Portionspris</span>
-                          <span className="font-bold text-dencon-800 text-lg">{totals.pricePerPortion.toFixed(2)} kr.</span>
+                          <span className="text-sm text-inkSoft">Portionspris</span>
+                          <span className="font-display font-semibold text-ink text-xl">{totals.pricePerPortion.toFixed(2)} kr.</span>
                         </div>
                         <div className="flex items-baseline justify-between">
-                          <span className="text-sm text-ink/60">Pr. uge ({guests} gæster)</span>
-                          <span className="font-bold text-dencon-800 text-lg">{Math.round(totals.weekly).toLocaleString('da-DK')} kr.</span>
+                          <span className="text-sm text-inkSoft">Pr. uge ({guests} gæster)</span>
+                          <span className="font-display font-semibold text-ink text-xl">{Math.round(totals.weekly).toLocaleString('da-DK')} kr.</span>
                         </div>
-                        <div className="pt-3 border-t border-sand">
-                          <div className="text-[11px] uppercase tracking-wider text-ink/50 font-semibold mb-2">Varenumre hos grossist</div>
+                        <div className="pt-3 border-t border-line">
+                          <div className="text-[10px] uppercase tracking-nav text-inkMute font-bold mb-2">Varenumre hos grossist</div>
                           <ul className="text-xs space-y-1">
                             {Object.values(selectedProducts).filter(Boolean).map(p => (
                               <li key={p.id} className="flex justify-between">
-                                <span className="text-ink/70">{p.name}</span>
-                                <span className="font-mono text-dencon-700">{p.vno}</span>
+                                <span className="text-inkSoft">{p.name}</span>
+                                <span className="font-mono text-ink">{p.vno}</span>
                               </li>
                             ))}
                           </ul>
@@ -772,45 +933,46 @@
 
                 {/* TRIN 5 — Lead-formular eller låst-op indhold */}
                 {!unlocked ? (
-                  <div className="mt-8 rounded-2xl bg-dencon-50 border border-dencon-200 p-6 sm:p-8">
-                    <div className="grid lg:grid-cols-2 gap-6 items-start">
+                  <div className="mt-8 rounded-2xl bg-cream border border-line p-6 sm:p-10">
+                    <div className="grid lg:grid-cols-2 gap-8 items-start">
                       <div>
-                        <h2 className="font-display text-2xl font-bold text-dencon-800">
-                          Lås op for præcise priser og varenumre
-                        </h2>
-                        <p className="text-sm text-ink/70 mt-2">
+                        <p className="text-[11px] uppercase tracking-nav text-coral font-bold mb-2">Trin 4 af 4</p>
+                        <h3 className="font-display text-3xl sm:text-4xl font-semibold text-ink leading-tight">
+                          Lås op for præcise priser & varenumre
+                        </h3>
+                        <p className="text-inkSoft mt-3">
                           Indtast dine oplysninger for at se dine præcise portionspriser, totaløkonomi
                           samt varenumre til Hørkram, Dagrofa eller BC Catering.
                         </p>
-                        <ul className="mt-4 text-sm space-y-2 text-ink/80">
-                          <li className="flex gap-2"><span>✓</span> Portionspris pr. gæst</li>
-                          <li className="flex gap-2"><span>✓</span> Interaktiv kuvert-beregner</li>
-                          <li className="flex gap-2"><span>✓</span> Varenumre til din grossist</li>
-                          <li className="flex gap-2"><span>✓</span> Downloadbar PDF til dit team</li>
+                        <ul className="mt-5 text-sm space-y-2 text-ink/85">
+                          <li className="flex gap-2"><span className="text-coral">✓</span> Portionspris pr. gæst</li>
+                          <li className="flex gap-2"><span className="text-coral">✓</span> Interaktiv kuvert-beregner</li>
+                          <li className="flex gap-2"><span className="text-coral">✓</span> Varenumre til din grossist</li>
+                          <li className="flex gap-2"><span className="text-coral">✓</span> Downloadbar PDF til dit team</li>
                         </ul>
                       </div>
 
-                      <form onSubmit={submitForm} className="bg-white border border-sand rounded-2xl p-5 sm:p-6 shadow-card space-y-3">
+                      <form onSubmit={submitForm} className="bg-paper border border-line rounded-lg p-5 sm:p-6 shadow-card space-y-3">
                         <div>
-                          <label className="text-xs font-semibold text-ink/70">Navn</label>
+                          <label className="text-[11px] uppercase tracking-nav font-bold text-inkSoft">Navn</label>
                           <input required value={form.name} onChange={e=>setForm({...form, name:e.target.value})}
-                            className="mt-1 w-full rounded-lg border border-sand bg-cream/40 px-3 py-2 focus:outline-none focus:border-dencon-600" placeholder="Fornavn Efternavn" />
+                            className="mt-1.5 w-full rounded-md border border-line bg-bg/60 px-3 py-2.5 focus:outline-none focus:border-ink" placeholder="Fornavn Efternavn" />
                         </div>
                         <div>
-                          <label className="text-xs font-semibold text-ink/70">E-mail</label>
+                          <label className="text-[11px] uppercase tracking-nav font-bold text-inkSoft">E-mail</label>
                           <input required type="email" value={form.email} onChange={e=>setForm({...form, email:e.target.value})}
-                            className="mt-1 w-full rounded-lg border border-sand bg-cream/40 px-3 py-2 focus:outline-none focus:border-dencon-600" placeholder="navn@firma.dk" />
+                            className="mt-1.5 w-full rounded-md border border-line bg-bg/60 px-3 py-2.5 focus:outline-none focus:border-ink" placeholder="navn@firma.dk" />
                         </div>
                         <div className="grid sm:grid-cols-2 gap-3">
                           <div>
-                            <label className="text-xs font-semibold text-ink/70">Virksomhed</label>
+                            <label className="text-[11px] uppercase tracking-nav font-bold text-inkSoft">Virksomhed</label>
                             <input required value={form.company} onChange={e=>setForm({...form, company:e.target.value})}
-                              className="mt-1 w-full rounded-lg border border-sand bg-cream/40 px-3 py-2 focus:outline-none focus:border-dencon-600" placeholder="F.eks. Café Nordlys" />
+                              className="mt-1.5 w-full rounded-md border border-line bg-bg/60 px-3 py-2.5 focus:outline-none focus:border-ink" placeholder="F.eks. Café Nordlys" />
                           </div>
                           <div>
-                            <label className="text-xs font-semibold text-ink/70">Køkkentype</label>
+                            <label className="text-[11px] uppercase tracking-nav font-bold text-inkSoft">Køkkentype</label>
                             <select required value={form.kitchen} onChange={e=>setForm({...form, kitchen:e.target.value})}
-                              className="mt-1 w-full rounded-lg border border-sand bg-cream/40 px-3 py-2 focus:outline-none focus:border-dencon-600">
+                              className="mt-1.5 w-full rounded-md border border-line bg-bg/60 px-3 py-2.5 focus:outline-none focus:border-ink">
                               <option value="">Vælg…</option>
                               <option>Restaurant</option>
                               <option>Café / bar</option>
@@ -821,9 +983,9 @@
                           </div>
                         </div>
                         <div>
-                          <label className="text-xs font-semibold text-ink/70">Hvilken grossist bruger du i dag?</label>
+                          <label className="text-[11px] uppercase tracking-nav font-bold text-inkSoft">Hvilken grossist bruger du i dag?</label>
                           <select required value={form.wholesaler} onChange={e=>setForm({...form, wholesaler:e.target.value})}
-                            className="mt-1 w-full rounded-lg border border-sand bg-cream/40 px-3 py-2 focus:outline-none focus:border-dencon-600">
+                            className="mt-1.5 w-full rounded-md border border-line bg-bg/60 px-3 py-2.5 focus:outline-none focus:border-ink">
                             <option value="">Vælg grossist…</option>
                             <option>Hørkram</option>
                             <option>Dagrofa Foodservice</option>
@@ -833,10 +995,10 @@
                           </select>
                         </div>
                         <button type="submit"
-                          className="w-full mt-2 px-5 py-3 rounded-xl bg-dencon-600 text-white font-semibold hover:bg-dencon-700 transition-all shadow-card hover:shadow-cardHover">
-                          🔓 Lås priser og varenumre op
+                          className="w-full mt-2 px-5 py-3.5 rounded-full bg-coral text-paper font-semibold tracking-wide hover:bg-coralDk transition-all shadow-card hover:shadow-cardHover">
+                          Lås priser & varenumre op
                         </button>
-                        <p className="text-[11px] text-ink/50 leading-relaxed">
+                        <p className="text-[11px] text-inkMute leading-relaxed">
                           Ved at indsende accepterer du, at Dencon Foods kontakter dig vedr. dit koncept.
                           Vi deler ikke dine oplysninger.
                         </p>
@@ -844,29 +1006,28 @@
                     </div>
                   </div>
                 ) : (
-                  <div className="mt-8 rounded-2xl bg-white border border-dencon-200 p-6 sm:p-8 shadow-card fade-in">
+                  <div className="mt-8 rounded-2xl bg-paper border border-line p-6 sm:p-10 shadow-card fade-in">
                     <div className="flex items-start gap-3">
-                      <div className="text-2xl">🔓</div>
+                      <div className="w-10 h-10 rounded-full bg-coral text-paper grid place-items-center font-bold">✓</div>
                       <div>
-                        <h2 className="font-display text-2xl font-bold text-dencon-800">
+                        <h3 className="font-display text-3xl font-semibold text-ink">
                           Tak {form.name?.split(' ')[0] || ''} — dit koncept er låst op
-                        </h2>
-                        <p className="text-sm text-ink/70 mt-1">
-                          Vi har også sendt en kopi til <strong>{form.email}</strong>. Justér gæsteantal for at se din ugeøkonomi.
+                        </h3>
+                        <p className="text-sm text-inkSoft mt-1">
+                          Vi har også sendt en kopi til <strong className="text-ink">{form.email}</strong>. Justér gæsteantal for at se din ugeøkonomi.
                         </p>
                       </div>
                     </div>
 
-                    {/* Kuvert-beregner */}
-                    <div className="mt-6 rounded-xl bg-cream border border-sand p-5">
-                      <div className="flex items-baseline justify-between">
+                    <div className="mt-6 rounded-lg bg-cream border border-line p-5">
+                      <div className="flex items-baseline justify-between flex-wrap gap-3">
                         <div>
-                          <div className="text-[11px] uppercase tracking-wider text-gold font-bold">Kuvert-beregner</div>
-                          <div className="font-display text-xl font-bold text-dencon-800">{guests.toLocaleString('da-DK')} gæster pr. uge</div>
+                          <div className="text-[10px] uppercase tracking-nav text-coral font-bold">Kuvert-beregner</div>
+                          <div className="font-display text-2xl font-semibold text-ink">{guests.toLocaleString('da-DK')} gæster pr. uge</div>
                         </div>
                         <div className="text-right">
-                          <div className="text-[11px] uppercase tracking-wider text-ink/50">Ugentlig vareomkostning</div>
-                          <div className="font-display text-2xl font-bold text-dencon-700">{Math.round(totals.weekly).toLocaleString('da-DK')} kr.</div>
+                          <div className="text-[10px] uppercase tracking-nav text-inkMute">Ugentlig vareomkostning</div>
+                          <div className="font-display text-3xl font-semibold text-ink">{Math.round(totals.weekly).toLocaleString('da-DK')} kr.</div>
                         </div>
                       </div>
                       <input
@@ -875,33 +1036,32 @@
                         style={{'--p': `${sliderPct}%`}}
                         className="w-full mt-4"
                       />
-                      <div className="flex justify-between text-[11px] text-ink/50 mt-1">
+                      <div className="flex justify-between text-[10px] uppercase tracking-nav text-inkMute mt-1">
                         <span>50</span><span>500</span><span>1000</span><span>2000</span>
                       </div>
                       <div className="grid sm:grid-cols-3 gap-3 mt-5">
-                        <div className="rounded-lg bg-white border border-sand p-3 text-center">
-                          <div className="text-[11px] uppercase tracking-wider text-ink/50">Portionspris</div>
-                          <div className="font-bold text-dencon-800 text-lg">{totals.pricePerPortion.toFixed(2)} kr.</div>
+                        <div className="rounded-md bg-paper border border-line p-3 text-center">
+                          <div className="text-[10px] uppercase tracking-nav text-inkMute">Portionspris</div>
+                          <div className="font-display font-semibold text-ink text-xl">{totals.pricePerPortion.toFixed(2)} kr.</div>
                         </div>
-                        <div className="rounded-lg bg-white border border-sand p-3 text-center">
-                          <div className="text-[11px] uppercase tracking-wider text-ink/50">Pr. måned (4 uger)</div>
-                          <div className="font-bold text-dencon-800 text-lg">{Math.round(totals.weekly*4).toLocaleString('da-DK')} kr.</div>
+                        <div className="rounded-md bg-paper border border-line p-3 text-center">
+                          <div className="text-[10px] uppercase tracking-nav text-inkMute">Pr. måned (4 uger)</div>
+                          <div className="font-display font-semibold text-ink text-xl">{Math.round(totals.weekly*4).toLocaleString('da-DK')} kr.</div>
                         </div>
-                        <div className="rounded-lg bg-white border border-sand p-3 text-center">
-                          <div className="text-[11px] uppercase tracking-wider text-ink/50">Pr. år (50 uger)</div>
-                          <div className="font-bold text-dencon-800 text-lg">{Math.round(totals.weekly*50).toLocaleString('da-DK')} kr.</div>
+                        <div className="rounded-md bg-paper border border-line p-3 text-center">
+                          <div className="text-[10px] uppercase tracking-nav text-inkMute">Pr. år (50 uger)</div>
+                          <div className="font-display font-semibold text-ink text-xl">{Math.round(totals.weekly*50).toLocaleString('da-DK')} kr.</div>
                         </div>
                       </div>
                     </div>
 
-                    {/* Varenumre + handlinger */}
                     <div className="grid sm:grid-cols-2 gap-3 mt-6">
                       <button onClick={() => window.print()}
-                        className="px-5 py-3 rounded-xl bg-dencon-600 text-white font-semibold hover:bg-dencon-700 transition-all shadow-card hover:shadow-cardHover">
+                        className="px-5 py-3.5 rounded-full bg-coral text-paper font-semibold tracking-wide hover:bg-coralDk transition-all shadow-card hover:shadow-cardHover">
                         ⬇ Download PDF
                       </button>
                       <button onClick={resetAll}
-                        className="px-5 py-3 rounded-xl border border-dencon-600 text-dencon-700 font-semibold hover:bg-dencon-50 transition-all">
+                        className="px-5 py-3.5 rounded-full border border-ink text-ink font-semibold tracking-wide hover:bg-ink hover:text-paper transition-all">
                         Byg et nyt koncept
                       </button>
                     </div>
@@ -909,18 +1069,20 @@
                 )}
 
                 <div className="mt-8">
-                  <button onClick={() => setStep(3)} className="text-sm text-ink/60 hover:text-dencon-700">← Tilbage og justér tallerken</button>
+                  <button onClick={() => setStep(3)} className="text-sm text-inkSoft hover:text-coral">← Tilbage og justér tallerken</button>
                 </div>
               </section>
             )}
           </main>
 
-          <footer className="mt-12 border-t border-sand bg-white">
-            <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 text-xs text-ink/50 flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between">
-              <div>© Dencon Foods A/S · Foodservice partner siden 1984</div>
-              <div>Priser er vejledende og afhænger af din grossistaftale.</div>
-            </div>
-          </footer>
+          <DenconFooter />
+
+          {/* Dencon's "scroll-top" koral-knap (matcher screenshot) */}
+          <button onClick={() => window.scrollTo({top:0,behavior:'smooth'})}
+            aria-label="Til toppen"
+            className="fixed bottom-6 right-6 w-12 h-12 rounded-md dencon-pill grid place-items-center shadow-cardHover text-xl">
+            ↑
+          </button>
         </div>
       );
     }
